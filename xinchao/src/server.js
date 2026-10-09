@@ -334,7 +334,7 @@ async function runCycle() {
         driveKey: topDrives(state)[0]?.key ?? null,
         sleepHours: sleepHours == null ? null : Number(sleepHours.toFixed(2)),
       };
-      if (!config.shadowMode && config.ombre.writeEnabled) {
+      if (!config.shadowMode && config.ombre.writeEnabled && config.ombre.dreamWriteEnabled) {
         try { dream.ombreBucketId = await ombre.storeDream(dream); }
         catch (error) { log('ombre_write_failed', { message: error.message }); }
       }
@@ -1186,6 +1186,9 @@ const server = createServer(async (request, response) => {
         ok: true,
         system: 'xinchao-dynamic-mind',
         mode: config.shadowMode ? 'shadow' : 'active',
+        dryRun: config.dryRun,
+        memoryTarget: config.ombre.target,
+        memoryWritesEnabled: config.ombre.writeEnabled && !config.shadowMode,
         version: SYSTEM_VERSION,
       });
     }

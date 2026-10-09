@@ -73,7 +73,7 @@ async function fixture(t, options = {}) {
   t.after(() => new Promise((resolve) => server.close(resolve)));
   const base = `http://127.0.0.1:${server.address().port}`;
   return { base, calls, logins: () => logins,
-    config: { url: `${base}/mcp`, extraUrl: `${base}/mcp-extra`, token: 'memory-token', authMode: 'token', readEnabled: true, writeEnabled: true, breathMaxResults: 3, breathMaxTokens: 800 } };
+    config: { url: `${base}/mcp`, extraUrl: `${base}/mcp-extra`, token: 'memory-token', authMode: 'token', readEnabled: true, writeEnabled: true, dreamWriteEnabled: true, breathMaxResults: 3, breathMaxTokens: 800 } };
 }
 
 test('OB3.2 surfacing adapts arguments and enriches refs with AI-side metadata only', async (t) => {
@@ -136,6 +136,29 @@ test('forget is soft delete; extra letters have independent MCP session', async 
   await client.call('letter_read', {});
   const letter = f.calls.find((call) => call.name === 'letter_read');
   assert.equal(letter.path, '/mcp-extra'); assert.equal(letter.session, 'extra-session');
+});
+
+test('legacy forget reason and restore map without losing IDs or changing text', async (t) => {
+  const f = await fixture(t); const client = new Ob32Adapter(f.config);
+  await client.call('forget', { id: SOURCE, reason: '用户明确软删' });
+  await client.call('restore', { id: SOURCE });
+  const traces = f.calls.filter(call => call.name === 'trace');
+  assert.deepEqual(traces[0].args, { bucket_id: SOURCE, delete: true, delete_reason: '用户明确软删' });
+  assert.deepEqual(traces[1].args, { bucket_id: SOURCE, restore: true });
+  await assert.rejects(client.call('forget', { id: SOURCE, bucket_id: NEW_ID }), /aliases disagree/);
+  assert.equal(f.calls.filter(call => call.name === 'trace').length, 2);
+});
+
+test('destructive replacements and unknown automatic writes are blocked before OB', async (t) => {
+  const f = await fixture(t); const client = new Ob32Adapter(f.config);
+  for (const args of [{ hard_delete: true }, { content: '替换正文' }, { old_str: '旧', new_str: '新' }, { meaning_replace: [] }, { media_replace: [] }]) {
+    await assert.rejects(client.call('trace', { bucket_id: SOURCE, ...args }), /destructive_write_disabled/);
+  }
+  await assert.rejects(client.call('hold', { content: '未审阅', auto: true, source: 'unknown' }), /candidate gate/);
+  assert.equal(f.calls.length, 0);
+  const optedIn = new Ob32Adapter({ ...f.config, allowDestructiveWrites: true });
+  await optedIn.call('trace', { bucket_id: SOURCE, content: '用户明确纠错' });
+  assert.equal(f.calls.at(-1).args.content, '用户明确纠错');
 });
 
 test('write gate rejects direct gateway writes without contacting OB', async (t) => {
@@ -221,7 +244,7 @@ test('real HTTP service completes Claude-style OAuth/PKCE, bridges OB, and gates
   const publicBase = 'https://xinchao.test';
   const app = spawn(process.execPath, ['src/server.js'], {
     cwd: fileURLToPath(new URL('..', import.meta.url)),
-    env: { ...process.env, PORT: String(port), SERVICE_TOKEN: 'service-'.repeat(8), SHADOW_MODE: 'true',
+    env: { ...process.env, DRYRUN: 'false', PORT: String(port), SERVICE_TOKEN: 'service-'.repeat(8), SHADOW_MODE: 'true',
       STATE_PATH: join(directory, 'state.json'), PERSONALITY_PATH: join(directory, 'personality.json'),
       TRANSITION_JOURNAL_PATH: join(directory, 'transitions.jsonl'), CABIN_STATE_PATH: join(directory, 'cabin.json'),
       BOX_STATE_PATH: join(directory, 'box.json'), OAUTH_STATE_PATH: join(directory, 'oauth.json'),
@@ -281,4 +304,19 @@ test('real HTTP service completes Claude-style OAuth/PKCE, bridges OB, and gates
   assert.equal(JSON.stringify(snapshot).includes('memory-token'), false);
   const preview = await fetch(base + `/dashboard/api/memory-bucket?id=${SOURCE}`, { headers: { Cookie: cookie } }).then((r) => r.json());
   assert.equal(preview.lineCount, 7);
+});
+
+test('read-only OB3.2 blocks dream witness mutations before contacting the upstream', async (t) => {
+  const f = await fixture(t); const client = new Ob32Adapter({ ...f.config, writeEnabled: false });
+  await assert.rejects(client.call('dream', { window_hours: 48 }), /write_disabled/);
+  assert.equal(f.calls.length, 0);
+  assert.ok(!(await client.listTools()).some(tool => tool.name === 'dream'));
+});
+
+test('normal writes cannot enable dreams and legacy grow source cannot silently change splitting', async (t) => {
+  const f = await fixture(t); const client = new Ob32Adapter({ ...f.config, dreamWriteEnabled: false });
+  assert.equal(await client.storeDream({dream:'test',residue:'test',awareness:'test'}), null);
+  await assert.rejects(client.call('hold', {content:'dream',auto:true,source:'xinchao-dream'}), /dream_write_disabled/);
+  await assert.rejects(client.call('grow', {content:'two events',source:'legacy-producer'}), /explicit reviewed items/);
+  assert.equal(f.calls.length, 0);
 });

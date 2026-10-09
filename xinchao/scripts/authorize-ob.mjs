@@ -5,7 +5,8 @@ import { dirname, resolve } from 'node:path';
 
 // Run on YOUR computer. Password is entered only on the existing OB's page.
 // Output is a private credential FILE, never a printed access/refresh token.
-const resource = new URL(process.argv[2] || 'https://gaoli.zeabur.app/mcp');
+if (!process.argv[2]) throw new Error('Pass the intended OB HTTPS MCP URL explicitly; use a separate test grant output file for DRYRUN');
+const resource = new URL(process.argv[2]);
 const output = resolve(process.argv[3] || '.private/ob-oauth.json');
 if (resource.protocol !== 'https:') throw new Error('Use the existing public HTTPS MCP URL');
 const metadataUrl = new URL('/.well-known/oauth-authorization-server', resource);

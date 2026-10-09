@@ -7,3 +7,7 @@ xinchao/state/
 .DS_Store
 xinchao/configs/interaction-rules.json
 xinchao/configs/attention-rules.json
+
+**/ob-test-oauth.json
+__pycache__/
+*.pyc

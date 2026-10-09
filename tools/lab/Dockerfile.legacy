@@ -1,0 +1,10 @@
+FROM xinchao-risk-ob32:6f7335d
+WORKDIR /app
+RUN rm -rf /app/src /app/frontend
+COPY src/ /app/src/
+COPY frontend/ /app/frontend/
+COPY VERSION /app/VERSION
+COPY config.default.yaml /app/config.default.yaml
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]

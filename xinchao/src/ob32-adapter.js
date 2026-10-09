@@ -4,17 +4,24 @@ const LETTER_TOOLS = new Set(['letter_read', 'letter_write', 'letter_lock_update
 
 export function adaptOb32Call(name, input = {}) {
   const args = { ...input };
-  if (name === 'forget') return { name: 'trace', args: { bucket_id: args.bucket_id, delete: true } };
+  if (name === 'forget' || name === 'restore') {
+    if (args.id && args.bucket_id && args.id !== args.bucket_id) throw new Error('OB bucket ID aliases disagree');
+    const id = args.bucket_id || args.id;
+    if (!id) throw new Error('OB bucket ID is required');
+    return { name: 'trace', args: name === 'restore' ? { bucket_id: id, restore: true }
+      : { bucket_id: id, delete: true, ...(args.reason ? { delete_reason: args.reason } : {}) } };
+  }
+  if (args.auto === true && args.source !== 'xinchao-dream') {
+    throw new Error('OB3.2 has no OB2.6 automatic candidate gate; keep unreviewed output in the heart box');
+  }
   if (name === 'breath_advanced') { delete args.mode; delete args.with_ids; }
   // These fields are emitted by the heart's internal producers, not OB 3.2.
   if (name === 'hold') {
     if (args.source && !args.why_remembered) args.why_remembered = `心潮来源：${args.source}${args.auto ? '（自动产出，非现实事件）' : ''}`;
     delete args.source; delete args.auto;
   }
-  if (name === 'grow' && args.source) {
-    if (!args.items) args.items = [{ content: args.content, why_remembered: `心潮来源：${args.source}` }];
-    delete args.source;
-  }
+  if (name === 'grow' && args.source) throw new Error('OB3.2 grow source compatibility needs explicit reviewed items; use hold for a single kept output');
+  if (name === 'grow') delete args.auto;
   return { name, args };
 }
 
@@ -34,7 +41,17 @@ export class Ob32Adapter extends OmbreClient {
   }
 
   async call(name, args = {}, timeoutMs = 15000) {
+    // OB3.2 dream updates candidate witness dates: it is not a pure read.
+    if (name === 'dream' && !this.config.writeEnabled) throw new Error('ombre_write_disabled: OB3.2 dream mutates I candidate evidence');
+    if (args.auto === true && args.source === 'xinchao-dream' && !this.config.dreamWriteEnabled) {
+      throw new Error('ombre_dream_write_disabled');
+    }
     const mapped = adaptOb32Call(name, args);
+    if (mapped.name === 'trace' && !this.config.allowDestructiveWrites && (
+      mapped.args.hard_delete || String(mapped.args.content || '').trim() || String(mapped.args.old_str || '').trim()
+      || 'meaning_replace' in mapped.args || 'media_replace' in mapped.args)) {
+      throw new Error('ombre_destructive_write_disabled: verify a restorable backup before enabling replacement or physical deletion');
+    }
     const result = LETTER_TOOLS.has(mapped.name) && this.extra
       ? await this.extra.call(mapped.name, mapped.args, timeoutMs)
       : await super.call(mapped.name, mapped.args, timeoutMs);
@@ -54,12 +71,22 @@ export class Ob32Adapter extends OmbreClient {
       const extras = await this.extra.listTools();
       for (const tool of extras) if (LETTER_TOOLS.has(tool.name) && !tools.some((item) => item.name === tool.name)) tools.push(tool);
     }
-    if (tools.some((tool) => tool.name === 'trace') && !tools.some((tool) => tool.name === 'forget')) {
-      tools.push({ name: 'forget', description: '软删除记忆，保留原文并移入归档。',
-        inputSchema: { type: 'object', properties: { bucket_id: { type: 'string', minLength: 1 } }, required: ['bucket_id'], additionalProperties: false },
-        annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true } });
+    if (tools.some((tool) => tool.name === 'trace')) {
+      for (const name of ['forget', 'restore']) if (!tools.some((tool) => tool.name === name)) {
+        tools.push({ name, description: name === 'forget' ? '软删除记忆，保留原文并移入归档；支持旧id/reason参数。' : '恢复软删除的记忆；不会恢复已物理删除的文件。',
+          inputSchema: { type: 'object', properties: { bucket_id: { type: 'string', minLength: 1 }, id: { type: 'string', minLength: 1 },
+            ...(name === 'forget' ? { reason: { type: 'string' } } : {}) },
+            anyOf: [{ required: ['bucket_id'] }, { required: ['id'] }], additionalProperties: false },
+          annotations: { readOnlyHint: false, destructiveHint: name === 'forget', idempotentHint: true } });
+      }
+      if (!this.config.allowDestructiveWrites) {
+        const i = tools.findIndex((tool) => tool.name === 'trace');
+        const schema = structuredClone(tools[i].inputSchema);
+        for (const key of ['hard_delete', 'content', 'old_str', 'new_str', 'meaning_replace', 'media_replace']) delete schema.properties?.[key];
+        tools[i] = { ...tools[i], inputSchema: schema };
+      }
     }
-    return tools;
+    return this.config.writeEnabled ? tools : tools.filter((tool) => tool.name !== 'dream');
   }
 
   // OB3.2 grow reports titles for new items, not reliable IDs. Keep is one
@@ -72,6 +99,11 @@ export class Ob32Adapter extends OmbreClient {
     const id = extractText(result).match(/(?:新建|合并)→([a-f0-9]{12,64})\b/i)?.[1];
     if (!id) throw new Error('OB hold completed without a verifiable ID; do not repeat the write blindly');
     return id;
+  }
+
+  async storeDream(dream) {
+    if (!this.config.dreamWriteEnabled) return null;
+    return super.storeDream(dream);
   }
 
   async loginDashboard() {

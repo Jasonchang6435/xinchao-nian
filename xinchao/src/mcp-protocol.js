@@ -26,7 +26,7 @@ const INTERACTION_TYPES = new Set([
 // hold 保留（2026-08-09 复议：hold 有了 meaning 字段能补上下文，与 grow 不冲突——
 // 日常/日记整理走 grow，重要瞬间可用 hold 但必须写 meaning）。
 // 走代理转发到 OB；schema 在 tools/list 时动态从 OB 拉，永不漂移。
-export const OB_PROXY_TOOLS = ['breath', 'breath_search', 'breath_advanced', 'hold', 'grow', 'trace', 'forget', 'dream', 'anchor', 'release', 'I', 'pulse', 'feel', 'plan', 'letter_read', 'letter_write', 'letter_lock_update'];
+export const OB_PROXY_TOOLS = ['breath', 'breath_search', 'breath_advanced', 'hold', 'grow', 'trace', 'forget', 'restore', 'dream', 'anchor', 'release', 'I', 'pulse', 'feel', 'plan', 'letter_read', 'letter_write', 'letter_lock_update'];
 const OB_PROXY_SET = new Set(OB_PROXY_TOOLS);
 
 // 对外用中文标题 + 中文说明（内部名保持不变，用于协议路由）。让机看到的是"浮现记忆"而不是"breath"。
