@@ -1,0 +1,135 @@
+{
+  "phases": [
+    {
+      "phase": "initial",
+      "checks": [
+        "both_http_health",
+        "ob_dashboard_html",
+        "ob_dashboard_private_api_requires_login",
+        "heart_dashboard_requires_session",
+        "heart_mcp_disabled_by_default",
+        "initial_blank_user_memories"
+      ],
+      "passed": 6,
+      "productionContacted": false,
+      "knownLimitations": [
+        "Original heart calls breath_advanced but bundled OB does not expose it."
+      ],
+      "onlineZeaburVerified": false,
+      "onlineClaudeVerified": false
+    },
+    {
+      "phase": "write",
+      "checks": [
+        "both_http_health",
+        "ob_dashboard_html",
+        "ob_dashboard_private_api_requires_login",
+        "heart_dashboard_requires_session",
+        "heart_oauth_dynamic_registration",
+        "heart_oauth_approval_redirect",
+        "heart_oauth_state_returned",
+        "heart_oauth_pkce_token",
+        "initialize_http_1",
+        "tools/list_http_2",
+        "heart_and_ob_tools_available",
+        "known_original_advanced_recall_gap",
+        "tools/call_http_3",
+        "gateway_hold_succeeds",
+        "exact_body_persisted_once",
+        "tools/call_http_4",
+        "heart_state_event_written",
+        "heart_event_survives_recreation",
+        "tools/call_http_5",
+        "gateway_recall_returns_memory",
+        "heart_dashboard_independent_credentials",
+        "heart_star_map_contains_persisted_id",
+        "heart_dashboard_token_is_not_mcp_token",
+        "ob_sidecar_map_auth",
+        "ob_dashboard_login",
+        "ob_logical_export",
+        "export_contains_synthetic_body",
+        "export_has_integrity_manifest"
+      ],
+      "passed": 28,
+      "productionContacted": false,
+      "knownLimitations": [
+        "Original heart calls breath_advanced but bundled OB does not expose it."
+      ],
+      "onlineZeaburVerified": false,
+      "onlineClaudeVerified": false
+    },
+    {
+      "phase": "recreated-1",
+      "checks": [
+        "both_http_health",
+        "ob_dashboard_html",
+        "ob_dashboard_private_api_requires_login",
+        "heart_dashboard_requires_session",
+        "initialize_http_1",
+        "tools/list_http_2",
+        "heart_and_ob_tools_available",
+        "known_original_advanced_recall_gap",
+        "body_and_id_survive_recreated_container",
+        "heart_event_survives_recreation",
+        "tools/call_http_3",
+        "gateway_recall_returns_memory",
+        "heart_dashboard_independent_credentials",
+        "heart_star_map_contains_persisted_id",
+        "heart_dashboard_token_is_not_mcp_token",
+        "ob_sidecar_map_auth",
+        "ob_dashboard_login",
+        "ob_logical_export",
+        "export_contains_synthetic_body",
+        "export_has_integrity_manifest",
+        "oauth_grant_survives_recreation"
+      ],
+      "passed": 21,
+      "productionContacted": false,
+      "knownLimitations": [
+        "Original heart calls breath_advanced but bundled OB does not expose it."
+      ],
+      "onlineZeaburVerified": false,
+      "onlineClaudeVerified": false
+    },
+    {
+      "phase": "recreated-2",
+      "checks": [
+        "both_http_health",
+        "ob_dashboard_html",
+        "ob_dashboard_private_api_requires_login",
+        "heart_dashboard_requires_session",
+        "initialize_http_1",
+        "tools/list_http_2",
+        "heart_and_ob_tools_available",
+        "known_original_advanced_recall_gap",
+        "body_and_id_survive_recreated_container",
+        "heart_event_survives_recreation",
+        "tools/call_http_3",
+        "gateway_recall_returns_memory",
+        "heart_dashboard_independent_credentials",
+        "heart_star_map_contains_persisted_id",
+        "heart_dashboard_token_is_not_mcp_token",
+        "ob_sidecar_map_auth",
+        "ob_dashboard_login",
+        "ob_logical_export",
+        "export_contains_synthetic_body",
+        "export_has_integrity_manifest",
+        "oauth_grant_survives_recreation"
+      ],
+      "passed": 21,
+      "productionContacted": false,
+      "knownLimitations": [
+        "Original heart calls breath_advanced but bundled OB does not expose it."
+      ],
+      "onlineZeaburVerified": false,
+      "onlineClaudeVerified": false
+    }
+  ],
+  "checks": 76,
+  "heartUid": 1000,
+  "containerRecreations": 3,
+  "productionContacted": false,
+  "onlineZeaburVerified": false,
+  "onlineClaudeVerified": false,
+  "fullRestoreTested": false
+}

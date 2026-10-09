@@ -1,0 +1,28 @@
+# Build from the repository root: docker build -f Dockerfile.ombre .
+ARG PYTHON_IMAGE=python:3.12-slim
+FROM ${PYTHON_IMAGE}
+WORKDIR /app
+# Zeabur supplies HTTPS ingress; cloudflared is deliberately not installed here.
+ARG PIP_INDEX_URL=""
+ARG PIP_TRUSTED_HOST=""
+COPY ombre-brain/requirements.lock.txt ./
+RUN pip install --no-cache-dir --retries 5 --timeout 60 \
+    ${PIP_INDEX_URL:+-i "$PIP_INDEX_URL"} \
+    ${PIP_TRUSTED_HOST:+--trusted-host "$PIP_TRUSTED_HOST"} \
+    --require-hashes -r requirements.lock.txt
+COPY ombre-brain/src ./src
+COPY ombre-brain/frontend ./frontend
+COPY ombre-brain/VERSION ombre-brain/config.default.yaml ombre-brain/entrypoint.sh ./
+COPY ombre-brain/docs/CLAUDE_PROMPT.md ombre-brain/docs/INTERNALS.md ombre-brain/docs/MULTI_OWNER.md ombre-brain/docs/OPERATIONS.md ./docs/
+COPY ombre-brain/README.upstream.md ./README.md
+COPY ombre-brain/CHANGELOG.md ./CHANGELOG.md
+COPY deploy/zeabur/ob-entrypoint.sh /usr/local/bin/ob-entrypoint
+RUN chmod 755 /app/entrypoint.sh /usr/local/bin/ob-entrypoint
+ENV OMBRE_TRANSPORT=streamable-http OMBRE_PORT=8000 \
+    OMBRE_BUCKETS_DIR=/app/buckets OMBRE_CONFIG_PATH=/app/buckets/config.yaml \
+    OMBRE_EMBED_BACKEND=api OMBRE_MCP_REQUIRE_AUTH=true
+EXPOSE 8000
+VOLUME ["/app/buckets"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+    CMD python -c "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:'+os.environ.get('OMBRE_PORT','8000')+'/health',timeout=4)"
+ENTRYPOINT ["/usr/local/bin/ob-entrypoint"]
