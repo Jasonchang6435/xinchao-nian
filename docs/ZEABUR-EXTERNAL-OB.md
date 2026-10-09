@@ -23,20 +23,9 @@ Claude ── OAuth + MCP ─────────> 同一个新服务
 
 ## 2. 先准备原 OB 的认证，不修改它
 
-### A. 原来已有静态 Bearer
+### A. 推荐：OAuth 授权已有 OB
 
-在原 OB 的 Zeabur Variables 查看已有 `OMBRE_MCP_AUTH_MODE` 与 `OMBRE_MCP_TOKEN`。如果现有模式接受静态令牌，把**已有**令牌复制到新服务的同名变量。不要为了这条路线更改原服务模式或重新部署。
-
-新服务使用：
-
-```dotenv
-OMBRE_AUTH_MODE=token
-OMBRE_MCP_TOKEN=<原OB已接受的令牌>
-```
-
-### B. 原来只有 OAuth，或不确定静态令牌
-
-已核对原服务暴露 OAuth 元数据，未授权 MCP 请求返回401。但这些公开信息不能确认后台是否同时允许静态令牌。无需猜一个令牌，也无需切换旧服务鉴权，可以直接授权新桥接客户端。
+本次以 OAuth 为主路线，环境模板也默认 `OMBRE_AUTH_MODE=oauth`。原 [OB README 的 OAuth 说明](https://github.com/Jasonchang6435/Ombre-Brain/blob/main/README.md#oauth-授权流程详解)明确：HTTP(S) MCP 默认要求 OAuth，授权页输入的是原 OB 的 Dashboard 密码，通过动态注册和授权码交换取得访问/刷新令牌。README 同时提供 hybrid/token 备选，但不能据此判断你的运行服务已启用静态令牌。此前已核对原服务暴露 OAuth 元数据；按现有 OAuth 授权即可，无需修改原服务模式。
 
 在自己的电脑安装 Node.js 22或更高版本，取得本分支代码：
 
@@ -46,7 +35,7 @@ cd xinchao-nian/xinchao
 node scripts/authorize-ob.mjs https://gaoli.zeabur.app/mcp
 ```
 
-脚本打印授权URL。用**同一台电脑**的浏览器打开，按原OB授权页输入已有凭据。脚本使用动态客户端注册、PKCE和本地回调；不会调用记忆读写工具，也不会打印访问/刷新令牌。
+脚本打印授权URL。用**同一台电脑**的浏览器打开，在原OB授权页输入**原OB的 Dashboard 密码**。脚本使用动态客户端注册、PKCE和本地回调；不会调用记忆读写工具，也不会打印访问/刷新令牌。
 
 授权成功生成 `.private/ob-oauth.json`（权限600；Git忽略）。已有同名文件时脚本拒绝覆盖，重新授权可传入另一个私有输出文件路径作为第二个参数。
 
@@ -63,6 +52,26 @@ OMBRE_OAUTH_STATE_PATH=/app/state/ob-oauth.json
 ```
 
 第一次连接自动刷新并将当前凭据写入新卷；后续优先使用卷内的最新刷新凭据，环境变量仅用于首次初始化。授权过期或被撤销时需重新授权，并显式替换/移走**新心潮卷内**旧的 `ob-oauth.json` 再重启新服务；不要操作原OB记忆卷。也可用Zeabur文件管理将私有凭据文件一次性导入新卷，不要将会在每次部署覆盖刷新的凭据文件配置为固定镜像或静态挂载。
+
+### B. 备选：原服务已经支持静态 Bearer
+
+在原 OB 的 Zeabur Variables 查看已有 `OMBRE_MCP_AUTH_MODE` 与 `OMBRE_MCP_TOKEN`。如果现有模式接受静态令牌，把**已有**令牌复制到新服务的同名变量。不要为了这条路线更改原服务模式或重新部署。
+
+新服务使用：
+
+```dotenv
+OMBRE_AUTH_MODE=token
+OMBRE_MCP_TOKEN=<原OB已接受的令牌>
+```
+
+### 两次授权各使用什么凭据
+
+| 链路 | 授权页 | 输入 | 状态保存位置 |
+|---|---|---|---|
+| 新心潮 → 原OB | `gaoli.zeabur.app` 的OAuth页 | 原OB Dashboard密码 | 新心潮 `/app/state/ob-oauth.json` |
+| Claude → 新心潮 | 新心潮域名的OAuth页 | 新心潮 `OAUTH_APPROVAL_TOKEN` | 新心潮 `/app/state/oauth.json` |
+
+这是两个独立OAuth客户端关系。不要复制原Claude连接器的令牌；为新心潮单独授权，原Claude→OB连接继续保留。原OB密码只在原OB授权页输入；需要人类星图/预览时，才另外填入新服务的 `OMBRE_DASHBOARD_PASSWORD`。不需要将密码或刷新令牌发到聊天。
 
 ## 3. 在 Zeabur 只创建新服务
 
