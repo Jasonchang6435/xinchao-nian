@@ -124,6 +124,8 @@ SHADOW_MODE=false
 
 **Claude**：开启MCP/OAuth之后，添加自定义连接器，URL填 `https://你的新心潮域名/mcp`。在“心潮念”授权页输入 `OAUTH_APPROVAL_TOKEN`。授权页若显示“Ombre Brain”，说明连接到了OB管理域名，需纠正。
 
+手工部署必须在首次授权之前确认心潮的 Zeabur **硬盘**页已挂载 `/app/state`；Dockerfile 的 `VOLUME` 声明不能替代平台卷。否则重启会丢失授权记录，Claude 刷新失败后要求重新连接。已有数据时先备份再挂卷，恢复文件所有者必须为 UID/GID1000。详细诊断与安全恢复步骤见 [OAuth 持久化排查](zeabur/OAUTH-PERSISTENCE.md)。
+
 `OAUTH_PUBLIC_BASE_URL` 必须使用HTTPS，原版OAuth启动会拒绝HTTP，连localhost也不例外。内部Docker测试可以使用HTTPS资源标识并在私网直接HTTP请求，真实Claude连接必须有实际可访问的公网HTTPS。
 
 五类口令各有用途；不要把 `SERVICE_TOKEN`、OB内部令牌或OB管理密码交给公开可视化网页。Runtime Bridge、Bark与手机注意力监测按原文档单独启用，初始模板不打开它们。

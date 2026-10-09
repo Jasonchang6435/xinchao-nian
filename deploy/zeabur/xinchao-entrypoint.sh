@@ -16,6 +16,24 @@ if [ "$(id -u)" = 0 ]; then
     mkdir -p /app/state
     chown node:node /app/state
     chmod 700 /app/state
+    # Zeabur exec runs as root even though the server runs as uid 1000.
+    # Recover known private state files restored by that root session. Leave
+    # other owners and all unrelated files untouched; never follow symlinks.
+    for name in state.json oauth.json black-box.json cabin.json transitions.jsonl personality.json bridge-queue.json; do
+        state_file="/app/state/$name"
+        if [ -L "$state_file" ]; then
+            echo "[zeabur] refusing symlink in known state file: $name" >&2
+            exit 1
+        fi
+        if [ -f "$state_file" ] && [ "$(stat -c %u "$state_file")" = 0 ]; then
+            if [ "$(stat -c %h "$state_file")" != 1 ]; then
+                echo "[zeabur] refusing hard-linked state file: $name" >&2
+                exit 1
+            fi
+            chown node:node "$state_file"
+            chmod 600 "$state_file"
+        fi
+    done
     exec su-exec node:node "$0" "$@"
 fi
 if [ ! -d /app/state ] || [ ! -w /app/state ]; then
