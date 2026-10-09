@@ -76,6 +76,8 @@ CLI命令依据：[Zeabur官方CLI实现](https://github.com/zeabur/cli/blob/mai
 
 网页控制台直接从 GitHub 部署单服务：Root Directory 留空、分支选 `codex/zeabur-full-stack`，根目录 `Dockerfile` 会让探测识别为 Docker，默认构建心潮（端口 18110，卷 `/app/state`，健康检查 `/health`）。若这个单服务要构建 OB，设置 `ZBPACK_DOCKERFILE_PATH=Dockerfile.ombre`、端口 8000、卷 `/app/buckets`。完整双服务部署仍用模板。
 
+单服务不会自动带环境变量，至少要在服务的 Variables 里设置 `SERVICE_TOKEN`（`openssl rand -hex 32`，≥32字符，不能是 `replace-with...` 占位值），否则容器启动即报 `SERVICE_TOKEN is required` 退出。要开公开可视化再加 `DASHBOARD_ENABLED=true`、`DASHBOARD_ACCESS_TOKEN`（另一个独立的≥32字符随机值）、`DASHBOARD_PUBLIC_BASE_URL=https://实际心潮域名`、`DASHBOARD_ALLOWED_ORIGINS=https://xinchaomind.uk`；接 OB 的变量按 `deploy/zeabur/xinchao.env.example` 配。
+
 模板通过两服务暴露的 `OB_INTERNAL_HOST` / `XINCHAO_INTERNAL_HOST` 和 `${CONTAINER_HOSTNAME}` 配置内网地址。实际内网主机名以Zeabur“网络→私有”显示为准；重命名服务不一定改变主机名。[官方内网说明](https://zeabur.com/docs/en-US/deploy/networking/private-networking)
 
 ## 4. 首次默认状态与合成验收
