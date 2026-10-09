@@ -5,3 +5,7 @@ xinchao/state/
 .DS_Store
 xinchao/configs/interaction-rules.json
 xinchao/configs/attention-rules.json
+deploy/zeabur/*.env
+deploy/zeabur/*private*.json
+
+**/__pycache__/

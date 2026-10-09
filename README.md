@@ -52,6 +52,10 @@
 
 > 3.1 不改变隐私边界：私有 `personality.json`、状态、记忆与凭据均不进入公开仓库。完整源码说明见 [`xinchao/README.md`](xinchao/README.md)，版本差异见 [`xinchao/CHANGELOG.md`](xinchao/CHANGELOG.md)。
 
+## Zeabur Docker 联合部署
+
+使用 [Zeabur 配置与部署说明](docs/ZEABUR.md)，通过 [完整项目模板](zeabur-template.yaml) 一次创建心潮和内置 OB 两个服务、独立持久卷与域名。此分支默认关闭心潮 MCP/OAuth，先做新空库验收；不连接旧 OB 或迁移历史。原版高级召回等已知限制见部署说明。
+
 ## 快速开始
 
 ```bash

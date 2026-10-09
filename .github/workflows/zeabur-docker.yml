@@ -1,0 +1,47 @@
+name: Zeabur Docker deployment checks
+on:
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - 'Dockerfile.*'
+      - '.dockerignore'
+      - 'zeabur-template.yaml'
+      - 'compose.zeabur.yaml'
+      - 'deploy/zeabur/**'
+      - 'xinchao/**'
+      - 'ombre-brain/**'
+      - '.github/workflows/zeabur-docker.yml'
+  push:
+    branches: [codex/zeabur-full-stack]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build both deployment images
+        run: |
+          docker build -f Dockerfile -t xinchao-zeabur-heart:20261009 .
+          docker build -f Dockerfile.ombre -t xinchao-zeabur-ombre:20261009 .
+      - name: Validate official template schemas
+        run: |
+          mkdir -p "$RUNNER_TEMP/zeabur-schema"
+          curl --retry 3 -fsSL https://schema.zeabur.app/template.json -o "$RUNNER_TEMP/zeabur-schema/template.json"
+          curl --retry 3 -fsSL https://schema.zeabur.app/prebuilt.json -o "$RUNNER_TEMP/zeabur-schema/prebuilt.json"
+          docker run --rm --network none --entrypoint python -v "$PWD:/repo:ro" -v "$RUNNER_TEMP/zeabur-schema:/schema:ro" xinchao-zeabur-ombre:20261009 /repo/deploy/zeabur/verify-template.py --schema-dir /schema
+      - name: Original heart tests in the deployment runtime
+        run: docker run --rm --network none --entrypoint node -v "$PWD/xinchao:/work:ro" -w /work xinchao-zeabur-heart:20261009 --test
+      - name: Entrypoint rejection and config preservation
+        run: python3 deploy/zeabur/verify-entrypoints.py
+      - name: Fresh volume, OAuth, MCP and repeated recreation
+        run: python3 deploy/zeabur/smoke-docker.py --output "$RUNNER_TEMP/xinchao-smoke"
+      - name: Upload sanitized result only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zeabur-smoke-evidence
+          path: ${{ runner.temp }}/xinchao-smoke/evidence.json
+          if-no-files-found: warn

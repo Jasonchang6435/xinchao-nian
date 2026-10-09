@@ -1,0 +1,202 @@
+# yaml-language-server: $schema=https://schema.zeabur.app/template.json
+apiVersion: zeabur.com/v1
+kind: Template
+metadata:
+  name: Xinchao Nian (bundled OB)
+spec:
+  description: 心潮及仓库内置 OB 的 Docker 联合部署；独立空库，不连接旧生产 OB。
+  tags: [AI, Tool]
+  variables:
+    - key: PUBLIC_DOMAIN
+      type: DOMAIN
+      name: 心潮域名
+      description: 选择新的 HTTPS 域名，作为公开可视化和心潮 MCP 的基础地址。
+    - key: OB_DOMAIN
+      type: DOMAIN
+      name: 新 OB 管理域名
+      description: 新内置 OB Dashboard 的独立域名，与现有 OB 服务分开。
+    - key: OMBRE_MCP_SERVICE_TOKEN
+      type: PASSWORD
+      name: 心潮到 OB 的内部令牌
+      description: 至少 32 字符；建议独立生成 64 位十六进制随机值。
+    - key: DYNAMIC_MIND_TOKEN
+      type: PASSWORD
+      name: OB 到心潮的内部令牌
+      description: 至少 32 字符；必须与其他口令不同。
+    - key: OMBRE_DASHBOARD_PASSWORD
+      type: PASSWORD
+      name: 新 OB 管理密码
+      description: 至少 16 字符；建议独立生成 64 位随机值。
+    - key: DASHBOARD_ACCESS_TOKEN
+      type: PASSWORD
+      name: 心潮可视化连接口令
+      description: 至少 32 字符；独立生成，在公开可视化网页连接时填写。
+    - key: OAUTH_APPROVAL_TOKEN
+      type: PASSWORD
+      name: 心潮 MCP 授权口令
+      description: 至少 16 字符；独立生成，合成数据验收开启 MCP 后使用。
+    - key: MODEL_BASE_URL
+      type: STRING
+      name: 模型 API 基础地址
+      description: OpenAI 兼容 HTTPS 地址，含 /v1（以供应商要求为准），例如 https://api.deepseek.com/v1。
+    - key: MODEL_NAME
+      type: STRING
+      name: 模型名称
+      description: 心潮及 OB 压缩使用的非推理模型，例如 deepseek-chat。
+    - key: MODEL_API_KEY
+      type: PASSWORD
+      name: 模型 API Key
+      description: 只在 Zeabur 输入；部署不会复制原 OB 配置，向量模型部署后单独设置。
+  readme: |-
+    # 心潮·念：内置 OB 联合部署
+    两个 Git/Docker 服务、两个持久卷，使用本仓库内置 OB 2.6.5。
+    新建独立项目，首次为空库，不导入或连接旧生产 OB。
+    默认关闭心潮 MCP/OAuth 与自动 OB 写入，先检查健康与 Dashboard。
+    合成数据验收时在 xinchao 服务开启 MCP_ENABLED=true、OAUTH_ENABLED=true。
+    OMBRE_WRITE_ENABLED=false 不禁止原版网关所有写工具；不要在验收前导入真实历史。
+    公开网页：https://xinchaomind.uk；连接地址是自己的心潮域名，口令为 DASHBOARD_ACCESS_TOKEN。
+    详细配置、验证、备份及已知功能限制见仓库 docs/ZEABUR.md。
+  services:
+    - name: ombre
+      template: GIT
+      domainKey: OB_DOMAIN
+      spec:
+        source:
+          source: GITHUB
+          repo: 1410500658
+          branch: codex/zeabur-full-stack
+          watchPaths: [Dockerfile.ombre, ombre-brain, deploy/zeabur/ob-entrypoint.sh]
+        ports:
+          - id: web
+            port: 8000
+            type: HTTP
+        volumes:
+          - id: memory
+            dir: /app/buckets
+        healthCheck:
+          type: HTTP
+          port: web
+          http:
+            path: /health
+        env:
+          ZBPACK_DOCKERFILE_PATH:
+            default: Dockerfile.ombre
+          OMBRE_TRANSPORT:
+            default: streamable-http
+          OMBRE_PORT:
+            default: '8000'
+          OMBRE_BUCKETS_DIR:
+            default: /app/buckets
+          OMBRE_CONFIG_PATH:
+            default: /app/buckets/config.yaml
+          OMBRE_MCP_REQUIRE_AUTH:
+            default: 'true'
+          OMBRE_MCP_SERVICE_TOKEN:
+            default: ${OMBRE_MCP_SERVICE_TOKEN}
+          OMBRE_DASHBOARD_PASSWORD:
+            default: ${OMBRE_DASHBOARD_PASSWORD}
+          OMBRE_COMPRESS_API_KEY:
+            default: ${MODEL_API_KEY}
+          OMBRE_COMPRESS_BASE_URL:
+            default: ${MODEL_BASE_URL}
+          OMBRE_COMPRESS_MODEL:
+            default: ${MODEL_NAME}
+          OMBRE_EMBED_BACKEND:
+            default: api
+          OMBRE_GROW_DEDUPE_SECONDS:
+            default: '21600'
+          DYNAMIC_MIND_URL:
+            default: http://${XINCHAO_INTERNAL_HOST}:18110
+          DYNAMIC_MIND_TOKEN:
+            default: ${DYNAMIC_MIND_TOKEN}
+          OB_INTERNAL_HOST:
+            default: ${CONTAINER_HOSTNAME}
+            expose: true
+        instructions:
+          - type: TEXT
+            title: 新 OB Dashboard
+            content: https://${ZEABUR_WEB_DOMAIN}
+    - name: xinchao
+      template: GIT
+      domainKey: PUBLIC_DOMAIN
+      dependencies: [ombre]
+      spec:
+        source:
+          source: GITHUB
+          repo: 1410500658
+          branch: codex/zeabur-full-stack
+          watchPaths: [Dockerfile, xinchao, deploy/zeabur/xinchao-entrypoint.sh]
+        ports:
+          - id: web
+            port: 18110
+            type: HTTP
+        volumes:
+          - id: state
+            dir: /app/state
+        healthCheck:
+          type: HTTP
+          port: web
+          http:
+            path: /health
+        env:
+          ZBPACK_DOCKERFILE_PATH:
+            default: Dockerfile
+          PORT:
+            default: '18110'
+          SERVICE_TOKEN:
+            default: ${DYNAMIC_MIND_TOKEN}
+          OMBRE_MCP_URL:
+            default: http://${OB_INTERNAL_HOST}:8000/mcp
+          OMBRE_MCP_TOKEN:
+            default: ${OMBRE_MCP_SERVICE_TOKEN}
+          OMBRE_READ_ENABLED:
+            default: 'true'
+          CONTEXT_OMBRE_ENABLED:
+            default: 'true'
+          OMBRE_WRITE_ENABLED:
+            default: 'false'
+          SHADOW_MODE:
+            default: 'true'
+          MODEL_BASE_URL:
+            default: ${MODEL_BASE_URL}
+          MODEL_NAME:
+            default: ${MODEL_NAME}
+          MODEL_API_KEY:
+            default: ${MODEL_API_KEY}
+          MCP_ENABLED:
+            default: 'false'
+          OAUTH_ENABLED:
+            default: 'false'
+          OAUTH_PUBLIC_BASE_URL:
+            default: https://${ZEABUR_WEB_DOMAIN}
+          OAUTH_APPROVAL_TOKEN:
+            default: ${OAUTH_APPROVAL_TOKEN}
+          DASHBOARD_ENABLED:
+            default: 'true'
+          DASHBOARD_PUBLIC_BASE_URL:
+            default: https://${ZEABUR_WEB_DOMAIN}
+          DASHBOARD_ACCESS_TOKEN:
+            default: ${DASHBOARD_ACCESS_TOKEN}
+          DASHBOARD_ALLOWED_ORIGINS:
+            default: https://xinchaomind.uk
+          DASHBOARD_INCLUDE_PRIVATE_TEXT:
+            default: 'false'
+          ATTENTION_ENABLED:
+            default: 'false'
+          JEV_SHADOW_ENABLED:
+            default: 'false'
+          XINCHAO_BOARD_TOKEN:
+            default: ''
+          XINCHAO_INTERNAL_HOST:
+            default: ${CONTAINER_HOSTNAME}
+            expose: true
+        instructions:
+          - type: TEXT
+            title: 心潮健康检查
+            content: https://${ZEABUR_WEB_DOMAIN}/health
+          - type: TEXT
+            title: 心潮 MCP（验收时开启后使用）
+            content: https://${ZEABUR_WEB_DOMAIN}/mcp
+          - type: TEXT
+            title: 公开可视化连接
+            content: 在 https://xinchaomind.uk 填 https://${ZEABUR_WEB_DOMAIN} 和自己的 Dashboard 口令。

@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-09",
+  "baseCommit": "a38a0a3241b0d3928d4a452ea1a38cf7efa14cd3",
+  "branch": "codex/zeabur-full-stack",
+  "nodeTests": 174,
+  "dockerChecks": 76,
+  "entrypointSafetyChecks": 5,
+  "containerRecreations": 3,
+  "heartUid": 1000,
+  "bundledObVersion": "2.6.5",
+  "pythonRequirementsChanged": false,
+  "runtimeBusinessSourceChanged": false,
+  "officialSchemaValidated": true,
+  "schemas": {
+    "template": "14610adf2232a7b829885ead5222ea4432ed15342cb0d74e504952b682243ee2",
+    "service": "d8fd627e9c51cb2166e77768bf6a943b98f611745aba58452de90294b3815be4"
+  },
+  "images": {
+    "heart": "sha256:19afda07ab595fb640daf682520e25355d6a2872204e7eba107da60c0c580099",
+    "ombre": "sha256:3dbc41c2acb1658e7d2eb05112ed6c7f73e05f643ce293a6d7af18ecd7e8990a"
+  },
+  "architecture": "linux/arm64",
+  "productionContacted": false,
+  "productionDataMigrated": false,
+  "zeaburDeploymentPerformed": false,
+  "claudeAccountVerified": false,
+  "publicFrontendVerified": false,
+  "modelProviderVerified": false,
+  "fullVolumeRestoreVerified": false,
+  "knownLimitations": [
+    "Original heart calls breath_advanced, absent from bundled OB.",
+    "No OB3.2 history conversion or synchronization.",
+    "No shared file heartbeat between the two service volumes.",
+    "Original OMBRE_WRITE_ENABLED is not a global MCP write gate."
+  ]
+}

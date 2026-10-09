@@ -1,0 +1,27 @@
+services:
+  ombre:
+    build:
+      context: .
+      dockerfile: Dockerfile.ombre
+    env_file: deploy/zeabur/ombre.env
+    volumes:
+      - ob-memory:/app/buckets
+    ports:
+      - '127.0.0.1:18001:8000'
+    restart: unless-stopped
+  xinchao:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: deploy/zeabur/xinchao.env
+    volumes:
+      - heart-state:/app/state
+    ports:
+      - '127.0.0.1:18110:18110'
+    depends_on:
+      ombre:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  ob-memory:
+  heart-state:
