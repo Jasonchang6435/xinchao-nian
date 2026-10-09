@@ -1,0 +1,12 @@
+# Optional local Docker smoke test. Zeabur uses the root Dockerfile directly.
+services:
+  xinchao:
+    build: .
+    env_file: ./xinchao/.env
+    ports:
+      - "127.0.0.1:18110:18110"
+    volumes:
+      - xinchao-state:/app/state
+    restart: unless-stopped
+volumes:
+  xinchao-state:

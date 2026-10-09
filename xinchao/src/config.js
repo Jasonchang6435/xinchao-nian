@@ -50,6 +50,17 @@ export function loadConfig() {
     ombre: {
       url: process.env.OMBRE_MCP_URL ?? '',
       token: process.env.OMBRE_MCP_TOKEN ?? '',
+      adapter: process.env.OMBRE_ADAPTER ?? 'native',
+      extraUrl: process.env.OMBRE_MCP_EXTRA_URL ?? '',
+      authMode: process.env.OMBRE_AUTH_MODE ?? 'token',
+      oauthStatePath: process.env.OMBRE_OAUTH_STATE_PATH ?? '/app/state/ob-oauth.json',
+      oauthClientId: process.env.OMBRE_OAUTH_CLIENT_ID ?? '',
+      oauthRefreshToken: process.env.OMBRE_OAUTH_REFRESH_TOKEN ?? '',
+      oauthTokenUrl: process.env.OMBRE_OAUTH_TOKEN_URL ?? '',
+      oauthResource: process.env.OMBRE_OAUTH_RESOURCE ?? '',
+      dashboardBaseUrl: process.env.OMBRE_DASHBOARD_BASE_URL ?? '',
+      dashboardPassword: process.env.OMBRE_DASHBOARD_PASSWORD ?? '',
+      dashboardSession: process.env.OMBRE_DASHBOARD_SESSION ?? '',
       readEnabled: bool('OMBRE_READ_ENABLED', false),
       writeEnabled: bool('OMBRE_WRITE_ENABLED', false),
       breathMaxResults: number('OMBRE_BREATH_MAX_RESULTS', 3, 1, 10),
@@ -227,7 +238,9 @@ export function validateConfig(config) {
         'OMBRE_MCP_URL is required when external memory integration is enabled'
       );
     }
-    if (!String(config.ombre.token || '').trim()) {
+    if (!['native', 'ob32'].includes(config.ombre.adapter ?? 'native')) throw new Error('OMBRE_ADAPTER must be native or ob32');
+    if (!['token', 'oauth'].includes(config.ombre.authMode ?? 'token')) throw new Error('OMBRE_AUTH_MODE must be token or oauth');
+    if (config.ombre.authMode !== 'oauth' && !String(config.ombre.token || '').trim()) {
       throw new Error(
         'OMBRE_MCP_TOKEN is required when external memory integration is enabled'
       );

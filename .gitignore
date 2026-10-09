@@ -1,4 +1,6 @@
 .env
+.private/
+**/ob-oauth.json
 buckets/
 xinchao/state/
 *.log

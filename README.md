@@ -2,6 +2,8 @@
 
 一个会**惦记你**的 AI 心智：**心潮**（动态驱力/欲望引擎）+ **Ombre Brain**（记忆库）深度融合，一键联合部署。
 
+> **已有独立 OB，部署到 Zeabur** → [独立 Docker 部署与完整接入步骤](docs/ZEABUR-EXTERNAL-OB.md)。仓库根目录的 Dockerfile 只构建心潮；设置 `OMBRE_ADAPTER=ob32` 桥接现有 OB 3.2，不启动附带的 OB、不迁移历史。环境变量模板：[xinchao/zeabur.env.example](xinchao/zeabur.env.example)。
+
 - **心潮** 让它有随时间变化的内在状态——想念、期待、挂念、好奇、独处欲……不是每次对话都从零开始。
 - **Ombre Brain** 给它一个真正的长期记忆库——breath 浮现、hold 沉淀、dream 消化、trace 追溯。
 - **融合** 让"欲望影响记忆影响行动"闭环：驱力偏置召回哪些记忆浮现，浮现的记忆又回推驱力。

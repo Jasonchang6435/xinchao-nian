@@ -7,7 +7,7 @@ function cleanBaseUrl(value) {
 
 export function memoryConnectionState(config = {}) {
   const urlConfigured = Boolean(String(config.ombre?.url ?? '').trim());
-  const tokenConfigured = Boolean(String(config.ombre?.token ?? '').trim());
+  const tokenConfigured = config.ombre?.authMode === 'oauth' || Boolean(String(config.ombre?.token ?? '').trim());
   const readEnabled = Boolean(config.ombre?.readEnabled);
   if (!urlConfigured) return 'ob_url_missing';
   if (!readEnabled) return 'ob_read_disabled';
