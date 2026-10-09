@@ -13,7 +13,8 @@ import { buildInteractionBridgeMessage } from './interaction-messages.js';
 import { selectUniqueBark } from './bark-dedupe.js';
 import { StateStore } from './state-store.js';
 import { ModelClient } from './model-client.js';
-import { OmbreClient, parseSurfacedDomains } from './ombre-client.js';
+import { OmbreClient, parseSurfacedDomains, isObWrite } from './ombre-client.js';
+import { Ob32Adapter } from './ob32-adapter.js';
 import { BarkClient } from './bark-client.js';
 import { readOmbreHeartbeat } from './heartbeat-store.js';
 import { buildContextEnvelope, contextDeliveryState, recordContextDelivery, buildNowCompact } from './context-envelope.js';
@@ -51,7 +52,7 @@ if (config.serviceToken.length < 32) {
 
 const store = new StateStore(config.statePath, () => newState());
 const model = new ModelClient(config.model);
-const ombre = new OmbreClient(config.ombre);
+const ombre = config.ombre.adapter === 'ob32' ? new Ob32Adapter(config.ombre) : new OmbreClient(config.ombre);
 const blackBox = new BlackBox(config.box.statePath);
 const bark = new BarkClient(config.bark);
 const journal = new TransitionJournal(config.journalPath);
@@ -333,7 +334,7 @@ async function runCycle() {
         driveKey: topDrives(state)[0]?.key ?? null,
         sleepHours: sleepHours == null ? null : Number(sleepHours.toFixed(2)),
       };
-      if (!config.shadowMode && config.ombre.writeEnabled) {
+      if (!config.shadowMode && config.ombre.writeEnabled && config.ombre.dreamWriteEnabled) {
         try { dream.ombreBucketId = await ombre.storeDream(dream); }
         catch (error) { log('ombre_write_failed', { message: error.message }); }
       }
@@ -1185,6 +1186,9 @@ const server = createServer(async (request, response) => {
         ok: true,
         system: 'xinchao-dynamic-mind',
         mode: config.shadowMode ? 'shadow' : 'active',
+        dryRun: config.dryRun,
+        memoryTarget: config.ombre.target,
+        memoryWritesEnabled: config.ombre.writeEnabled && !config.shadowMode,
         version: SYSTEM_VERSION,
       });
     }
@@ -1456,10 +1460,12 @@ const server = createServer(async (request, response) => {
         // 心潮念网关：把 OB 记忆工具经心潮同一端点暴露/转发。
         listObTools: async () => {
           if (!config.ombre.readEnabled) return [];
-          return ombre.listTools();
+          return (await ombre.listTools()).filter((tool) => config.ombre.writeEnabled && !config.shadowMode || !isObWrite(tool.name));
         },
         // 情绪 → 记忆：他经网关调 breath/hold 没自己给坐标时，替他带上此刻情绪（grow 不碰）。
         callOb: async (name, args) => {
+          if (!config.ombre.readEnabled) throw new Error('ombre_read_disabled');
+          if (isObWrite(name, args) && (!config.ombre.writeEnabled || config.shadowMode)) throw new Error('ombre_write_disabled');
           if (!config.ombre.emotionStamp) return ombre.call(name, args);
           const stamped = stampEmotionArgs(name, args, await store.read());
           if (stamped.stamped) log('ombre_emotion_stamped', { tool: String(name).slice(0, 40), ...stamped.coords });

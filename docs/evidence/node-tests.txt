@@ -1,0 +1,1220 @@
+
+> xinchao-dynamic-mind@4.0.0 test
+> node --test
+
+TAP version 13
+# Subtest: App 分类按名单，认不出的不算
+ok 1 - App 分类按名单，认不出的不算
+  ---
+  duration_ms: 0.605
+  type: 'test'
+  ...
+# Subtest: 她刚来过不算；过了 30 分钟、期间在刷 App 才算
+ok 2 - 她刚来过不算；过了 30 分钟、期间在刷 App 才算
+  ---
+  duration_ms: 0.152291
+  type: 'test'
+  ...
+# Subtest: App 和跟人在一起相加，封顶 1；只在她最后一次来之后的才算
+ok 3 - App 和跟人在一起相加，封顶 1；只在她最后一次来之后的才算
+  ---
+  duration_ms: 1.760792
+  type: 'test'
+  ...
+# Subtest: 家人最轻
+ok 4 - 家人最轻
+  ---
+  duration_ms: 0.216875
+  type: 'test'
+  ...
+# Subtest: scan keeps only causal kinds, one candidate per day, deduped for a week
+ok 5 - scan keeps only causal kinds, one candidate per day, deduped for a week
+  ---
+  duration_ms: 24.335917
+  type: 'test'
+  ...
+# Subtest: one per day: trigger wins over obsession, obsession comes the next day
+ok 6 - one per day: trigger wins over obsession, obsession comes the next day
+  ---
+  duration_ms: 3.116292
+  type: 'test'
+  ...
+# Subtest: counting rules are gone: surfacings and top drives never become candidates
+ok 7 - counting rules are gone: surfacings and top drives never become candidates
+  ---
+  duration_ms: 1.6335
+  type: 'test'
+  ...
+# Subtest: open candidates expire after two weeks without being forced on him
+ok 8 - open candidates expire after two weeks without being forced on him
+  ---
+  duration_ms: 2.694541
+  type: 'test'
+  ...
+# Subtest: confirm / dismiss resolve candidates and keep his own wording
+ok 9 - confirm / dismiss resolve candidates and keep his own wording
+  ---
+  duration_ms: 2.13625
+  type: 'test'
+  ...
+# Subtest: envelope shows candidates only on the review day; dashboard always; empty renders nothing
+ok 10 - envelope shows candidates only on the review day; dashboard always; empty renders nothing
+  ---
+  duration_ms: 4.380375
+  type: 'test'
+  ...
+# Subtest: old states gain awareness fields on settle
+ok 11 - old states gain awareness fields on settle
+  ---
+  duration_ms: 0.322333
+  type: 'test'
+  ...
+# Subtest: put / list / read / burn, expiry, and audit without content
+ok 12 - put / list / read / burn, expiry, and audit without content
+  ---
+  duration_ms: 176.683959
+  type: 'test'
+  ...
+# Subtest: kind falls back to other and text is required
+ok 13 - kind falls back to other and text is required
+  ---
+  duration_ms: 22.716
+  type: 'test'
+  ...
+# Subtest: surfaced items show only titles for the envelope
+ok 14 - surfaced items show only titles for the envelope
+  ---
+  duration_ms: 54.225458
+  type: 'test'
+  ...
+# Subtest: when and remind_at: reminder fires once, surfaces the item, and surfaced sorts by date
+ok 15 - when and remind_at: reminder fires once, surfaces the item, and surfaced sorts by date
+  ---
+  duration_ms: 72.249875
+  type: 'test'
+  ...
+# Subtest: boardEnabled only when both endpoint and token are set
+ok 16 - boardEnabled only when both endpoint and token are set
+  ---
+  duration_ms: 0.436208
+  type: 'test'
+  ...
+# Subtest: missing token is refused before any network call
+ok 17 - missing token is refused before any network call
+  ---
+  duration_ms: 0.201791
+  type: 'test'
+  ...
+# Subtest: over-length content is rejected locally, no network call
+ok 18 - over-length content is rejected locally, no network call
+  ---
+  duration_ms: 0.879625
+  type: 'test'
+  ...
+# Subtest: sends token header and returns the created message on success
+ok 19 - sends token header and returns the created message on success
+  ---
+  duration_ms: 12.491042
+  type: 'test'
+  ...
+# Subtest: surfaces the platform error text (e.g. daily limit)
+ok 20 - surfaces the platform error text (e.g. daily limit)
+  ---
+  duration_ms: 0.308792
+  type: 'test'
+  ...
+# Subtest: network failure is reported gracefully
+ok 21 - network failure is reported gracefully
+  ---
+  duration_ms: 0.115
+  type: 'test'
+  ...
+# Subtest: read hits the feed endpoint with token, default limit 10, no q
+ok 22 - read hits the feed endpoint with token, default limit 10, no q
+  ---
+  duration_ms: 0.360417
+  type: 'test'
+  ...
+# Subtest: read clamps limit to 1..50 and passes trimmed query
+ok 23 - read clamps limit to 1..50 and passes trimmed query
+  ---
+  duration_ms: 0.295625
+  type: 'test'
+  ...
+# Subtest: read without a token is refused before any network call
+ok 24 - read without a token is refused before any network call
+  ---
+  duration_ms: 0.2505
+  type: 'test'
+  ...
+# Subtest: Dashboard feedback preserves user_feedback reason
+ok 25 - Dashboard feedback preserves user_feedback reason
+  ---
+  duration_ms: 0.497292
+  type: 'test'
+  ...
+# Subtest: future delivery defaults to scheduled_interaction
+ok 26 - future delivery defaults to scheduled_interaction
+  ---
+  duration_ms: 0.067792
+  type: 'test'
+  ...
+# Subtest: AI 收件箱：开锁来信给正文，自己写过的信也在，上锁信只给数量和时间
+ok 27 - AI 收件箱：开锁来信给正文，自己写过的信也在，上锁信只给数量和时间
+  ---
+  duration_ms: 72.379292
+  type: 'test'
+  ...
+# Subtest: AI 已读：没读过的来信不管放多久都算未读，读一次才记已读，那次仍标为新信
+ok 28 - AI 已读：没读过的来信不管放多久都算未读，读一次才记已读，那次仍标为新信
+  ---
+  duration_ms: 87.844958
+  type: 'test'
+  ...
+# Subtest: locked user notes stay out of the AI inbox until the user unlocks them
+ok 29 - locked user notes stay out of the AI inbox until the user unlocks them
+  ---
+  duration_ms: 83.318584
+  type: 'test'
+  ...
+# Subtest: AI unread notes and love ledger totals are persisted and editable
+ok 30 - AI unread notes and love ledger totals are persisted and editable
+  ---
+  duration_ms: 143.628584
+  type: 'test'
+  ...
+# Subtest: diagnostics keep public web, Xinchao MCP and OB roles separate
+ok 31 - diagnostics keep public web, Xinchao MCP and OB roles separate
+  ---
+  duration_ms: 0.49925
+  type: 'test'
+  ...
+# Subtest: memory diagnostics explain the actual missing configuration
+ok 32 - memory diagnostics explain the actual missing configuration
+  ---
+  duration_ms: 0.075125
+  type: 'test'
+  ...
+# Subtest: manifest never borrows Dashboard URL for MCP or MCP URL for Dashboard
+ok 33 - manifest never borrows Dashboard URL for MCP or MCP URL for Dashboard
+  ---
+  duration_ms: 0.189667
+  type: 'test'
+  ...
+# Subtest: snapshot includes safe structured connection diagnostics
+ok 34 - snapshot includes safe structured connection diagnostics
+  ---
+  duration_ms: 2.522083
+  type: 'test'
+  ...
+# Subtest: dashboard session token supports cookie and browser header channels
+ok 35 - dashboard session token supports cookie and browser header channels
+  ---
+  duration_ms: 2.048542
+  type: 'test'
+  ...
+# Subtest: dashboard allowed origins are closed by default and normalized when configured
+ok 36 - dashboard allowed origins are closed by default and normalized when configured
+  ---
+  duration_ms: 0.937833
+  type: 'test'
+  ...
+# Subtest: dashboard keeps real thought sentences private by default
+ok 37 - dashboard keeps real thought sentences private by default
+  ---
+  duration_ms: 3.164125
+  type: 'test'
+  ...
+# Subtest: dashboard exposes only the strongest real sentence per drive after opt-in
+ok 38 - dashboard exposes only the strongest real sentence per drive after opt-in
+  ---
+  duration_ms: 0.782583
+  type: 'test'
+  ...
+# Subtest: dashboard snapshot projects personality core without private reasons by default
+ok 39 - dashboard snapshot projects personality core without private reasons by default
+  ---
+  duration_ms: 0.559416
+  type: 'test'
+  ...
+# Subtest: dashboard includes personality reasons only after private-text opt-in
+ok 40 - dashboard includes personality reasons only after private-text opt-in
+  ---
+  duration_ms: 0.156167
+  type: 'test'
+  ...
+# Subtest: default DRYRUN never borrows any live endpoint or credential
+ok 41 - default DRYRUN never borrows any live endpoint or credential
+  ---
+  duration_ms: 2.38
+  type: 'test'
+  ...
+# Subtest: enabling reads without a test endpoint fails closed
+ok 42 - enabling reads without a test endpoint fails closed
+  ---
+  duration_ms: 0.682792
+  type: 'test'
+  ...
+# Subtest: test credentials and test writes are independent from production flags
+ok 43 - test credentials and test writes are independent from production flags
+  ---
+  duration_ms: 0.374792
+  type: 'test'
+  ...
+# Subtest: test origins cannot alias a configured production origin through another path
+ok 44 - test origins cannot alias a configured production origin through another path
+  ---
+  duration_ms: 0.328083
+  type: 'test'
+  ...
+# Subtest: test Dashboard and OAuth origins are checked and grant files must be separate
+ok 45 - test Dashboard and OAuth origins are checked and grant files must be separate
+  ---
+  duration_ms: 2.286875
+  type: 'test'
+  ...
+# Subtest: switching to live stays write-disabled until its own explicit write opt-in
+ok 46 - switching to live stays write-disabled until its own explicit write opt-in
+  ---
+  duration_ms: 0.381042
+  type: 'test'
+  ...
+# Subtest: misspelled DRYRUN values fail rather than select live
+ok 47 - misspelled DRYRUN values fail rather than select live
+  ---
+  duration_ms: 0.265291
+  type: 'test'
+  ...
+# Subtest: test heart state never carries test bucket IDs into live state or shares a gateway grant
+ok 48 - test heart state never carries test bucket IDs into live state or shares a gateway grant
+  ---
+  duration_ms: 0.284917
+  type: 'test'
+  ...
+# Subtest: explicit test state aliases to production files fail closed
+ok 49 - explicit test state aliases to production files fail closed
+  ---
+  duration_ms: 0.716666
+  type: 'test'
+  ...
+# Subtest: affection lights 心动; with 害羞 it shows 害羞; it fades back to the base word
+ok 50 - affection lights 心动; with 害羞 it shows 害羞; it fades back to the base word
+  ---
+  duration_ms: 15.03625
+  type: 'test'
+  ...
+# Subtest: negative subs show as the word itself: 心疼 / 自责 / 生气 / 吃醋, and the now-line says it without the base
+ok 51 - negative subs show as the word itself: 心疼 / 自责 / 生气 / 吃醋, and the now-line says it without the base
+  ---
+  duration_ms: 4.268834
+  type: 'test'
+  ...
+# Subtest: 想念 instead of 低落 when 想她 is high and mood sinks; 得意 after getting something done
+ok 52 - 想念 instead of 低落 when 想她 is high and mood sinks; 得意 after getting something done
+  ---
+  duration_ms: 0.477708
+  type: 'test'
+  ...
+# Subtest: 10-03: light affection needs 3 within 30 min; the n-th 心动 of the day is shorter (×0.6, ≥15 min)
+ok 53 - 10-03: light affection needs 3 within 30 min; the n-th 心动 of the day is shorter (×0.6, ≥15 min)
+  ---
+  duration_ms: 2.791958
+  type: 'test'
+  ...
+# Subtest: 10-03 inertia: a small drift waits 10 min before the base word changes; a big drop changes at once; a caused word holds 15 min
+ok 54 - 10-03 inertia: a small drift waits 10 min before the base word changes; a big drop changes at once; a caused word holds 15 min
+  ---
+  duration_ms: 0.804458
+  type: 'test'
+  ...
+# Subtest: caused emotions leave marks for the tide band; her words only reach the dashboard when private text is on
+ok 55 - caused emotions leave marks for the tide band; her words only reach the dashboard when private text is on
+  ---
+  duration_ms: 16.809833
+  type: 'test'
+  ...
+# Subtest: mark-only events leave a mark (optionally back-dated) without moving any drive
+ok 56 - mark-only events leave a mark (optionally back-dated) without moving any drive
+  ---
+  duration_ms: 1.089625
+  type: 'test'
+  ...
+# Subtest: the same feeling coming again within 2 hours merges into one mark with a count
+ok 57 - the same feeling coming again within 2 hours merges into one mark with a count
+  ---
+  duration_ms: 0.359167
+  type: 'test'
+  ...
+# Subtest: old schema state upgrades additively without resetting drives
+ok 58 - old schema state upgrades additively without resetting drives
+  ---
+  duration_ms: 13.17025
+  type: 'test'
+  ...
+# Subtest: anger suppresses only natural possess growth and grief lifts possess/monitor growth
+ok 59 - anger suppresses only natural possess growth and grief lifts possess/monitor growth
+  ---
+  duration_ms: 0.992
+  type: 'test'
+  ...
+# Subtest: satisfaction plateau pauses time growth but lets a real event pass through
+ok 60 - satisfaction plateau pauses time growth but lets a real event pass through
+  ---
+  duration_ms: 1.143167
+  type: 'test'
+  ...
+# Subtest: neutral emotion leaves growth untouched (factor 1)
+ok 61 - neutral emotion leaves growth untouched (factor 1)
+  ---
+  duration_ms: 0.410583
+  type: 'test'
+  ...
+# Subtest: low valence speeds up monitor/possess and slows share; high valence does the reverse
+ok 62 - low valence speeds up monitor/possess and slows share; high valence does the reverse
+  ---
+  duration_ms: 14.143709
+  type: 'test'
+  ...
+# Subtest: high arousal speeds monitor and damps boredom/reflection
+ok 63 - high arousal speeds monitor and damps boredom/reflection
+  ---
+  duration_ms: 0.513792
+  type: 'test'
+  ...
+# Subtest: modulation stays inside its clamp and can be switched off
+ok 64 - modulation stays inside its clamp and can be switched off
+  ---
+  duration_ms: 0.46275
+  type: 'test'
+  ...
+# Subtest: a sad emotion never pushes a drive above its resting ceiling
+ok 65 - a sad emotion never pushes a drive above its resting ceiling
+  ---
+  duration_ms: 13.005333
+  type: 'test'
+  ...
+# Subtest: impulses and settles write journal samples with throttling
+ok 66 - impulses and settles write journal samples with throttling
+  ---
+  duration_ms: 14.87675
+  type: 'test'
+  ...
+# Subtest: day digest aggregates in Asia/Shanghai days and prunes old days
+ok 67 - day digest aggregates in Asia/Shanghai days and prunes old days
+  ---
+  duration_ms: 3.302333
+  type: 'test'
+  ...
+# Subtest: trend line appears in envelope once emotion has moved, and dashboard exposes journal
+ok 68 - trend line appears in envelope once emotion has moved, and dashboard exposes journal
+  ---
+  duration_ms: 3.350375
+  type: 'test'
+  ...
+# Subtest: old states without a journal upgrade cleanly
+ok 69 - old states without a journal upgrade cleanly
+  ---
+  duration_ms: 0.347167
+  type: 'test'
+  ...
+# Subtest: breath calls get the current emotion coordinates unless the caller gave their own
+ok 70 - breath calls get the current emotion coordinates unless the caller gave their own
+  ---
+  duration_ms: 4.380459
+  type: 'test'
+  ...
+# Subtest: hold is stamped only when the mood clearly leaves neutral; grow is never touched
+ok 71 - hold is stamped only when the mood clearly leaves neutral; grow is never touched
+  ---
+  duration_ms: 11.7265
+  type: 'test'
+  ...
+# Subtest: new state carries a neutral emotion and old states upgrade to the current schema
+ok 72 - new state carries a neutral emotion and old states upgrade to the current schema
+  ---
+  duration_ms: 14.24625
+  type: 'test'
+  ...
+# Subtest: conflict pushes valence down and arousal up; reconciliation pulls it back
+ok 73 - conflict pushes valence down and arousal up; reconciliation pulls it back
+  ---
+  duration_ms: 1.701083
+  type: 'test'
+  ...
+# Subtest: impulses have inertia: the same push moves less near the ceiling
+ok 74 - impulses have inertia: the same push moves less near the ceiling
+  ---
+  duration_ms: 1.223833
+  type: 'test'
+  ...
+# Subtest: duplicate event does not move emotion twice
+ok 75 - duplicate event does not move emotion twice
+  ---
+  duration_ms: 0.459417
+  type: 'test'
+  ...
+# Subtest: session tone pulls emotion toward its target
+ok 76 - session tone pulls emotion toward its target
+  ---
+  duration_ms: 0.304833
+  type: 'test'
+  ...
+# Subtest: emotion decays back toward baseline over time, faster while sleeping
+ok 77 - emotion decays back toward baseline over time, faster while sleeping
+  ---
+  duration_ms: 1.3905
+  type: 'test'
+  ...
+# Subtest: grief and anger drives lower the resting valence without any growth term
+ok 78 - grief and anger drives lower the resting valence without any growth term
+  ---
+  duration_ms: 0.526875
+  type: 'test'
+  ...
+# Subtest: labels cover the quadrants
+ok 79 - labels cover the quadrants
+  ---
+  duration_ms: 0.091208
+  type: 'test'
+  ...
+# Subtest: context envelope and dashboard expose the emotion line
+ok 80 - context envelope and dashboard expose the emotion line
+  ---
+  duration_ms: 2.137959
+  type: 'test'
+  ...
+# Subtest: grieve and anger decay toward zero (09-28: anger 6h, grieve 10h half-life) instead of parking at 0.15
+ok 81 - grieve and anger decay toward zero (09-28: anger 6h, grieve 10h half-life) instead of parking at 0.15
+  ---
+  duration_ms: 0.747459
+  type: 'test'
+  ...
+# Subtest: waking after a dream applies its mood and drops its image into the thought pool once
+ok 82 - waking after a dream applies its mood and drops its image into the thought pool once
+  ---
+  duration_ms: 0.739
+  type: 'test'
+  ...
+# Subtest: conflict with a cause remembers what he is angry about; reconciliation clears it
+ok 83 - conflict with a cause remembers what he is angry about; reconciliation clears it
+  ---
+  duration_ms: 16.876167
+  type: 'test'
+  ...
+# Subtest: grudge line stays quiet while anger is low and disappears when anger decays away
+ok 84 - grudge line stays quiet while anger is low and disappears when anger decays away
+  ---
+  duration_ms: 0.511791
+  type: 'test'
+  ...
+# Subtest: 3.3.10 AI 自己回传、没带她原话的事件：不叫醒、不刷新"上次见她"、不记作息
+ok 85 - 3.3.10 AI 自己回传、没带她原话的事件：不叫醒、不刷新"上次见她"、不记作息
+  ---
+  duration_ms: 15.284333
+  type: 'test'
+  ...
+# Subtest: 3.3.10 她真的来了（默认 presence）：照常叫醒、记作息
+ok 86 - 3.3.10 她真的来了（默认 presence）：照常叫醒、记作息
+  ---
+  duration_ms: 0.768084
+  type: 'test'
+  ...
+# Subtest: 3.3.10 白天走开一会儿（睡着不到 3 小时、没做梦）再回来：醒了，但不标"刚醒"
+ok 87 - 3.3.10 白天走开一会儿（睡着不到 3 小时、没做梦）再回来：醒了，但不标"刚醒"
+  ---
+  duration_ms: 0.516
+  type: 'test'
+  ...
+# Subtest: 3.3.10 作息按时间衰减：半衰期 7 天，隔一周再来，旧的只剩一半
+ok 88 - 3.3.10 作息按时间衰减：半衰期 7 天，隔一周再来，旧的只剩一半
+  ---
+  duration_ms: 1.10325
+  type: 'test'
+  ...
+# Subtest: 3.3.10 匣子：到点提醒读了也一直露头；unpin 只取消提醒、条目留着
+ok 89 - 3.3.10 匣子：到点提醒读了也一直露头；unpin 只取消提醒、条目留着
+  ---
+  duration_ms: 210.174833
+  type: 'test'
+  ...
+# Subtest: 3.3.10 此刻块：期待/挂念行不带强度数字，不会被兜底整块拦掉
+ok 90 - 3.3.10 此刻块：期待/挂念行不带强度数字，不会被兜底整块拦掉
+  ---
+  duration_ms: 2.335041
+  type: 'test'
+  ...
+# Subtest: 3.3.7 措辞：静息位是「平」，顶过静息线才「涌」，两小时掉/起 0.08 是「落」/「涨」
+ok 91 - 3.3.7 措辞：静息位是「平」，顶过静息线才「涌」，两小时掉/起 0.08 是「落」/「涨」
+  ---
+  duration_ms: 0.426792
+  type: 'test'
+  ...
+# Subtest: 3.3.7 亲密把想她真的拉下来，并进一段饱足平台
+ok 92 - 3.3.7 亲密把想她真的拉下来，并进一段饱足平台
+  ---
+  duration_ms: 15.843833
+  type: 'test'
+  ...
+# Subtest: 3.3.7 轨迹：每 30 分钟记一点；落下去写「落」，涨回来写「涨」，到顶后「平」
+ok 93 - 3.3.7 轨迹：每 30 分钟记一点；落下去写「落」，涨回来写「涨」，到顶后「平」
+  ---
+  duration_ms: 10.1695
+  type: 'test'
+  ...
+# Subtest: 3.3.8 一天十几次亲昵也砍不穿底线：想她停在静息线的 35% 附近，不会掉到 0.1
+ok 94 - 3.3.8 一天十几次亲昵也砍不穿底线：想她停在静息线的 35% 附近，不会掉到 0.1
+  ---
+  duration_ms: 19.037667
+  type: 'test'
+  ...
+# Subtest: 3.3.8 一小时内同类互动效果减半，平台不叠加
+ok 95 - 3.3.8 一小时内同类互动效果减半，平台不叠加
+  ---
+  duration_ms: 4.83475
+  type: 'test'
+  ...
+# Subtest: 3.3.9 同一段记忆 72 小时内算"最近浮现过"，过了就放出来
+ok 96 - 3.3.9 同一段记忆 72 小时内算"最近浮现过"，过了就放出来
+  ---
+  duration_ms: 1.682584
+  type: 'test'
+  ...
+# Subtest: 3.3.9 浮现文本按桶剔除，开头的准则段保留，条数回到原来
+ok 97 - 3.3.9 浮现文本按桶剔除，开头的准则段保留，条数回到原来
+  ---
+  duration_ms: 0.972208
+  type: 'test'
+  ...
+# Subtest: 3.3.9 闪念不挂在已经涌的维上，改挂下一维；都在涌就还挂最高的
+ok 98 - 3.3.9 闪念不挂在已经涌的维上，改挂下一维；都在涌就还挂最高的
+  ---
+  duration_ms: 0.281916
+  type: 'test'
+  ...
+# Subtest: interaction effects are limited per rolling 4-hour window, not per calendar day
+ok 99 - interaction effects are limited per rolling 4-hour window, not per calendar day
+  ---
+  duration_ms: 21.782875
+  type: 'test'
+  ...
+# Subtest: conflict / loss / reconciliation never use up the window and always apply
+ok 100 - conflict / loss / reconciliation never use up the window and always apply
+  ---
+  duration_ms: 4.491833
+  type: 'test'
+  ...
+# Subtest: schema 10：孤儿 key 丢掉、缺的补上，topDrives/pickIntent 不再因旧 key 崩
+ok 101 - schema 10：孤儿 key 丢掉、缺的补上，topDrives/pickIntent 不再因旧 key 崩
+  ---
+  duration_ms: 13.851
+  type: 'test'
+  ...
+# Subtest: schema 10：短名表全系统一份，覆盖每一个驱力
+ok 102 - schema 10：短名表全系统一份，覆盖每一个驱力
+  ---
+  duration_ms: 0.071917
+  type: 'test'
+  ...
+# Subtest: a four-round quarrel lifts anger visibly but no longer pins it at the top
+ok 103 - a four-round quarrel lifts anger visibly but no longer pins it at the top
+  ---
+  duration_ms: 18.319833
+  type: 'test'
+  ...
+# Subtest: being coaxed softens anger step by step but never below the quiet line, and keeps the grudge
+ok 104 - being coaxed softens anger step by step but never below the quiet line, and keeps the grudge
+  ---
+  duration_ms: 4.38825
+  type: 'test'
+  ...
+# Subtest: reconciliation needs her explicit words; without them it only counts as coaxing
+ok 105 - reconciliation needs her explicit words; without them it only counts as coaxing
+  ---
+  duration_ms: 2.065
+  type: 'test'
+  ...
+# Subtest: left unresolved, part of the anger turns into hurt instead of just fading
+ok 106 - left unresolved, part of the anger turns into hurt instead of just fading
+  ---
+  duration_ms: 1.155459
+  type: 'test'
+  ...
+# Subtest: hurt shows up in the now line even when longing drives are stronger
+ok 107 - hurt shows up in the now line even when longing drives are stronger
+  ---
+  duration_ms: 2.098416
+  type: 'test'
+  ...
+# Subtest: impatient "好了好了 / 算了算了" do not count as making up
+ok 108 - impatient "好了好了 / 算了算了" do not count as making up
+  ---
+  duration_ms: 1.992958
+  type: 'test'
+  ...
+# Subtest: just mentioning "和好" or asking about it does not count as making up
+ok 109 - just mentioning "和好" or asking about it does not count as making up
+  ---
+  duration_ms: 2.428875
+  type: 'test'
+  ...
+# Subtest: step 3: 馋她 is folded into 想她 — old saves keep the higher of the two, no separate crave left
+ok 110 - step 3: 馋她 is folded into 想她 — old saves keep the higher of the two, no separate crave left
+  ---
+  duration_ms: 12.772625
+  type: 'test'
+  ...
+# Subtest: sub-items: a real conflict with a sub shows 愤怒（…·不满）; without one only the broad name shows
+ok 111 - sub-items: a real conflict with a sub shows 愤怒（…·不满）; without one only the broad name shows
+  ---
+  duration_ms: 20.499167
+  type: 'test'
+  ...
+# Subtest: sub-items fade with the drive: once anger falls under 0.10 the sub is cleared
+ok 112 - sub-items fade with the drive: once anger falls under 0.10 the sub is cleared
+  ---
+  duration_ms: 2.283833
+  type: 'test'
+  ...
+# Subtest: mixed: angry but still longing → after 20 min one signal "气着又舍不得", then silence; capped after 6h and not reopened
+ok 113 - mixed: angry but still longing → after 20 min one signal "气着又舍不得", then silence; capped after 6h and not reopened
+  ---
+  duration_ms: 3.494125
+  type: 'test'
+  ...
+# Subtest: cling: while she is being affectionate, 想她 is not pushed to the floor; cling shows but never raises 想她 itself
+ok 114 - cling: while she is being affectionate, 想她 is not pushed to the floor; cling shows but never raises 想她 itself
+  ---
+  duration_ms: 2.068417
+  type: 'test'
+  ...
+# Subtest: favored is a drive key and never grows on its own (she being away is not neglect)
+ok 115 - favored is a drive key and never grows on its own (she being away is not neglect)
+  ---
+  duration_ms: 14.372958
+  type: 'test'
+  ...
+# Subtest: slighted lights it; the sub shows as 偏爱（…·吃醋）; an unknown sub shows only the broad name
+ok 116 - slighted lights it; the sub shows as 偏爱（…·吃醋）; an unknown sub shows only the broad name
+  ---
+  duration_ms: 5.086667
+  type: 'test'
+  ...
+# Subtest: being answered / chosen satisfies it: affection takes a big bite, plain replies a small one
+ok 117 - being answered / chosen satisfies it: affection takes a big bite, plain replies a small one
+  ---
+  duration_ms: 3.739958
+  type: 'test'
+  ...
+# Subtest: left alone it only fades slowly (12h half-life as a fallback), capped by event
+ok 118 - left alone it only fades slowly (12h half-life as a fallback), capped by event
+  ---
+  duration_ms: 4.106583
+  type: 'test'
+  ...
+# Subtest: slighted can carry a lighter weight (0.3–1): counts, but not as heavy
+ok 119 - slighted can carry a lighter weight (0.3–1): counts, but not as heavy
+  ---
+  duration_ms: 0.998375
+  type: 'test'
+  ...
+# Subtest: closeness sets the weight: her > family > known > stranger
+ok 120 - closeness sets the weight: her > family > known > stranger
+  ---
+  duration_ms: 16.661834
+  type: 'test'
+  ...
+# Subtest: 心疼 shows as 难过（…·心疼）; 不平 goes to anger; 想帮忙 to 分享欲 (unlabelled); 替人高兴 moves no drive
+ok 121 - 心疼 shows as 难过（…·心疼）; 不平 goes to anger; 想帮忙 to 分享欲 (unlabelled); 替人高兴 moves no drive
+  ---
+  duration_ms: 3.305542
+  type: 'test'
+  ...
+# Subtest: other people cannot drown him: their share is capped (strangers lower), the same story counts once
+ok 122 - other people cannot drown him: their share is capped (strangers lower), the same story counts once
+  ---
+  duration_ms: 5.596416
+  type: 'test'
+  ...
+# Subtest: helped relieves only the share that came from others, not her part
+ok 123 - helped relieves only the share that came from others, not her part
+  ---
+  duration_ms: 0.916625
+  type: 'test'
+  ...
+# Subtest: 10-03: same person + same sub counts once in 6h whatever the wording; a new day resets the daily cap
+ok 124 - 10-03: same person + same sub counts once in 6h whatever the wording; a new day resets the daily cap
+  ---
+  duration_ms: 2.3885
+  type: 'test'
+  ...
+# Subtest: social is gone; an old save folds it into 分享欲 by taking the larger value
+ok 125 - social is gone; an old save folds it into 分享欲 by taking the larger value
+  ---
+  duration_ms: 14.04625
+  type: 'test'
+  ...
+# Subtest: 她说了半句 → 好奇（…·想了解她）; her telling relieves it a little
+ok 126 - 她说了半句 → 好奇（…·想了解她）; her telling relieves it a little
+  ---
+  duration_ms: 2.918291
+  type: 'test'
+  ...
+# Subtest: 自责 sits under 难过
+ok 127 - 自责 sits under 难过
+  ---
+  duration_ms: 1.893583
+  type: 'test'
+  ...
+# Subtest: slights and unreconciled fights wear security down; being soothed and making up bring it back
+ok 128 - slights and unreconciled fights wear security down; being soothed and making up bring it back
+  ---
+  duration_ms: 19.9725
+  type: 'test'
+  ...
+# Subtest: confidence: getting things done and being praised thickens it; self-blame thins it; low confidence keeps 得意 dark
+ok 129 - confidence: getting things done and being praised thickens it; self-blame thins it; low confidence keeps 得意 dark
+  ---
+  duration_ms: 3.341875
+  type: 'test'
+  ...
+# Subtest: left alone, both axes drift back toward their baseline over days
+ok 130 - left alone, both axes drift back toward their baseline over days
+  ---
+  duration_ms: 0.321
+  type: 'test'
+  ...
+# Subtest: insecure: grief rises faster, and the emotion line can show 不安
+ok 131 - insecure: grief rises faster, and the emotion line can show 不安
+  ---
+  duration_ms: 0.698875
+  type: 'test'
+  ...
+# Subtest: OB3.2 surfacing adapts arguments and enriches refs with AI-side metadata only
+ok 132 - OB3.2 surfacing adapts arguments and enriches refs with AI-side metadata only
+  ---
+  duration_ms: 27.195792
+  type: 'test'
+  ...
+# Subtest: slow metadata cannot block recall and enriches subsequent calls from cache
+ok 133 - slow metadata cannot block recall and enriches subsequent calls from cache
+  ---
+  duration_ms: 1817.544916
+  type: 'test'
+  ...
+# Subtest: dream write stamps legal metadata then prevents dream self-recall
+ok 134 - dream write stamps legal metadata then prevents dream self-recall
+  ---
+  duration_ms: 8.503708
+  type: 'test'
+  ...
+# Subtest: failed dream marking reports a partial write without repeating hold
+ok 135 - failed dream marking reports a partial write without repeating hold
+  ---
+  duration_ms: 4.457833
+  type: 'test'
+  ...
+# Subtest: box keep uses unambiguous hold ID rather than mistaking grow title for an ID
+ok 136 - box keep uses unambiguous hold ID rather than mistaking grow title for an ID
+  ---
+  duration_ms: 2.821917
+  type: 'test'
+  ...
+# Subtest: forget is soft delete; extra letters have independent MCP session
+ok 137 - forget is soft delete; extra letters have independent MCP session
+  ---
+  duration_ms: 5.484083
+  type: 'test'
+  ...
+# Subtest: legacy forget reason and restore map without losing IDs or changing text
+ok 138 - legacy forget reason and restore map without losing IDs or changing text
+  ---
+  duration_ms: 3.161875
+  type: 'test'
+  ...
+# Subtest: destructive replacements and unknown automatic writes are blocked before OB
+ok 139 - destructive replacements and unknown automatic writes are blocked before OB
+  ---
+  duration_ms: 3.630584
+  type: 'test'
+  ...
+# Subtest: write gate rejects direct gateway writes without contacting OB
+ok 140 - write gate rejects direct gateway writes without contacting OB
+  ---
+  duration_ms: 2.878166
+  type: 'test'
+  ...
+# Subtest: human previews respect locks and seven-line limits; human cookie never reaches MCP
+ok 141 - human previews respect locks and seven-line limits; human cookie never reaches MCP
+  ---
+  duration_ms: 3.7105
+  type: 'test'
+  ...
+# Subtest: JSON-RPC errors and tool isError are failures, not successful empty text
+ok 142 - JSON-RPC errors and tool isError are failures, not successful empty text
+  ---
+  duration_ms: 4.232541
+  type: 'test'
+  ...
+# Subtest: ambiguous HTTP400 writes are never replayed
+ok 143 - ambiguous HTTP400 writes are never replayed
+  ---
+  duration_ms: 1.775417
+  type: 'test'
+  ...
+# Subtest: SSE parser selects the matching response after keepalive and notification
+ok 144 - SSE parser selects the matching response after keepalive and notification
+  ---
+  duration_ms: 0.259042
+  type: 'test'
+  ...
+# Subtest: gateway advertises and forwards advanced search and letters using upstream schemas
+ok 145 - gateway advertises and forwards advanced search and letters using upstream schemas
+  ---
+  duration_ms: 5.108792
+  type: 'test'
+  ...
+# Subtest: OAuth refresh is serialized and rotated credentials survive a restart
+ok 146 - OAuth refresh is serialized and rotated credentials survive a restart
+  ---
+  duration_ms: 3.971833
+  type: 'test'
+  ...
+# Subtest: real HTTP service completes Claude-style OAuth/PKCE, bridges OB, and gates writes
+ok 147 - real HTTP service completes Claude-style OAuth/PKCE, bridges OB, and gates writes
+  ---
+  duration_ms: 133.958583
+  type: 'test'
+  ...
+# Subtest: read-only OB3.2 blocks dream witness mutations before contacting the upstream
+ok 148 - read-only OB3.2 blocks dream witness mutations before contacting the upstream
+  ---
+  duration_ms: 5.073416
+  type: 'test'
+  ...
+# Subtest: normal writes cannot enable dreams and legacy grow source cannot silently change splitting
+ok 149 - normal writes cannot enable dreams and legacy grow source cannot silently change splitting
+  ---
+  duration_ms: 0.332791
+  type: 'test'
+  ...
+# Subtest: 拆 exchange：认「她说/他回」，没写就整段当她说的
+ok 150 - 拆 exchange：认「她说/他回」，没写就整段当她说的
+  ---
+  duration_ms: 0.71525
+  type: 'test'
+  ...
+# Subtest: 和好要真吵过、而且不是问句
+ok 151 - 和好要真吵过、而且不是问句
+  ---
+  duration_ms: 1.106667
+  type: 'test'
+  ...
+# Subtest: 心疼她本人要她真的难受；编的不算
+ok 152 - 心疼她本人要她真的难受；编的不算
+  ---
+  duration_ms: 0.365042
+  type: 'test'
+  ...
+# Subtest: 远近名单说了算（配置里写的名字）
+ok 153 - 远近名单说了算（配置里写的名字）
+  ---
+  duration_ms: 0.09225
+  type: 'test'
+  ...
+# Subtest: 吃醋要有细项；她说我忘了是被忘，他忘了是自责
+ok 154 - 吃醋要有细项；她说我忘了是被忘，他忘了是自责
+  ---
+  duration_ms: 0.203084
+  type: 'test'
+  ...
+# Subtest: 心动分轻重、害羞用原话补认
+ok 155 - 心动分轻重、害羞用原话补认
+  ---
+  duration_ms: 0.246667
+  type: 'test'
+  ...
+# Subtest: 刚亲近完一句不太紧的嫌弃当撒娇；日常告别不算失落
+ok 156 - 刚亲近完一句不太紧的嫌弃当撒娇；日常告别不算失落
+  ---
+  duration_ms: 0.262833
+  type: 'test'
+  ...
+# Subtest: MCP handshake reports the shared runtime version
+ok 157 - MCP handshake reports the shared runtime version
+  ---
+  duration_ms: 0.485
+  type: 'test'
+  ...
+# Subtest: tools/list keeps Xinchao, board and curated OB tools together
+ok 158 - tools/list keeps Xinchao, board and curated OB tools together
+  ---
+  duration_ms: 0.140667
+  type: 'test'
+  ...
+# Subtest: AI can submit one complete monthly personality reflection through MCP
+ok 159 - AI can submit one complete monthly personality reflection through MCP
+  ---
+  duration_ms: 0.364375
+  type: 'test'
+  ...
+# Subtest: OB failure does not remove Xinchao or board tools
+ok 160 - OB failure does not remove Xinchao or board tools
+  ---
+  duration_ms: 0.0925
+  type: 'test'
+  ...
+# Subtest: hidden tools disappear from tools/list
+ok 161 - hidden tools disappear from tools/list
+  ---
+  duration_ms: 0.119791
+  type: 'test'
+  ...
+# Subtest: xinchao_* tool replies carry a trailing now-line; xinchao_context does not
+ok 162 - xinchao_* tool replies carry a trailing now-line; xinchao_context does not
+  ---
+  duration_ms: 0.89075
+  type: 'test'
+  ...
+# Subtest: now-compact has header, drives in words with levels, emotion with cause, no numbers
+ok 163 - now-compact has header, drives in words with levels, emotion with cause, no numbers
+  ---
+  duration_ms: 14.2705
+  type: 'test'
+  ...
+# Subtest: extras line appears only when something is waiting; sleeping/just-woke lines
+ok 164 - extras line appears only when something is waiting; sleeping/just-woke lines
+  ---
+  duration_ms: 2.887292
+  type: 'test'
+  ...
+# Subtest: digest is stable for the same state and changes when the state changes materially
+ok 165 - digest is stable for the same state and changes when the state changes materially
+  ---
+  duration_ms: 1.0965
+  type: 'test'
+  ...
+# Subtest: sanity guard refuses stale, out-of-range, saturated or flat drive states
+ok 166 - sanity guard refuses stale, out-of-range, saturated or flat drive states
+  ---
+  duration_ms: 0.241375
+  type: 'test'
+  ...
+# Subtest: a broken emotion only drops the emotion line, not the whole block
+ok 167 - a broken emotion only drops the emotion line, not the whole block
+  ---
+  duration_ms: 0.173167
+  type: 'test'
+  ...
+# Subtest: emotion line is specific: bands and a drive flavour, never a bare 平静
+ok 168 - emotion line is specific: bands and a drive flavour, never a bare 平静
+  ---
+  duration_ms: 0.135542
+  type: 'test'
+  ...
+# Subtest: envelope and now-block mention the box count and surfaced titles only
+ok 169 - envelope and now-block mention the box count and surfaced titles only
+  ---
+  duration_ms: 0.933292
+  type: 'test'
+  ...
+# Subtest: while_away section lists undelivered self signals and cabin line counts recent notes
+ok 170 - while_away section lists undelivered self signals and cabin line counts recent notes
+  ---
+  duration_ms: 0.519791
+  type: 'test'
+  ...
+# Subtest: breath metadata exposes source bucket ids without guessing from body text
+ok 171 - breath metadata exposes source bucket ids without guessing from body text
+  ---
+  duration_ms: 1.24525
+  type: 'test'
+  ...
+# Subtest: pulse text becomes a metadata-only memory map
+ok 172 - pulse text becomes a metadata-only memory map
+  ---
+  duration_ms: 1.901917
+  type: 'test'
+  ...
+# Subtest: structured 3.0 map preserves optional emotional stamp fields
+ok 173 - structured 3.0 map preserves optional emotional stamp fields
+  ---
+  duration_ms: 0.154667
+  type: 'test'
+  ...
+# Subtest: bucket preview preserves original lines but never returns more than seven
+ok 174 - bucket preview preserves original lines but never returns more than seven
+  ---
+  duration_ms: 0.146792
+  type: 'test'
+  ...
+# Subtest: bucket preview refuses a mismatched bucket id
+ok 175 - bucket preview refuses a mismatched bucket id
+  ---
+  duration_ms: 0.123958
+  type: 'test'
+  ...
+# Subtest: archived buckets, budget notices and the ids json tail are dropped from surfaced material
+ok 176 - archived buckets, budget notices and the ids json tail are dropped from surfaced material
+  ---
+  duration_ms: 1.575958
+  type: 'test'
+  ...
+# Subtest: missing or damaged private personality mirror is neutral and non-fatal
+ok 177 - missing or damaged private personality mirror is neutral and non-fatal
+  ---
+  duration_ms: 10.886458
+  type: 'test'
+  ...
+# Subtest: only the four approved personality groups bias drives and remain capped at ten percent
+ok 178 - only the four approved personality groups bias drives and remain capped at ten percent
+  ---
+  duration_ms: 0.20075
+  type: 'test'
+  ...
+# Subtest: the cached monthly mirror reloads when the private file changes
+ok 179 - the cached monthly mirror reloads when the private file changes
+  ---
+  duration_ms: 8.700666
+  type: 'test'
+  ...
+# Subtest: personality changes only the effective drive ceiling and the drive engine never writes back to the core
+ok 180 - personality changes only the effective drive ceiling and the drive engine never writes back to the core
+  ---
+  duration_ms: 13.908208
+  type: 'test'
+  ...
+# Subtest: AI monthly assessment writes all 14 dimensions privately and retry is idempotent
+ok 181 - AI monthly assessment writes all 14 dimensions privately and retry is idempotent
+  ---
+  duration_ms: 8.682583
+  type: 'test'
+  ...
+# Subtest: simultaneous AI retries cannot create two assessments for one month
+ok 182 - simultaneous AI retries cannot create two assessments for one month
+  ---
+  duration_ms: 4.64025
+  type: 'test'
+  ...
+# Subtest: AI assessment rejects incomplete or unknown personality dimensions
+ok 183 - AI assessment rejects incomplete or unknown personality dimensions
+  ---
+  duration_ms: 4.191959
+  type: 'test'
+  ...
+# Subtest: personality stats summarize scores and the period summary round-trips through write and read
+ok 184 - personality stats summarize scores and the period summary round-trips through write and read
+  ---
+  duration_ms: 6.881
+  type: 'test'
+  ...
+# Subtest: personality stats are unavailable and non-fatal without a configured mirror
+ok 185 - personality stats are unavailable and non-fatal without a configured mirror
+  ---
+  duration_ms: 0.539292
+  type: 'test'
+  ...
+# Subtest: behavior anchors survive monthly assessment and update independently
+ok 186 - behavior anchors survive monthly assessment and update independently
+  ---
+  duration_ms: 25.424333
+  type: 'test'
+  ...
+# Subtest: anchors never leak into drive bias and are capped at seven
+ok 187 - anchors never leak into drive bias and are capped at seven
+  ---
+  duration_ms: 12.849
+  type: 'test'
+  ...
+# Subtest: drive peak fires once after 2h above 0.8, once per drive per day, and carries a now-line
+ok 188 - drive peak fires once after 2h above 0.8, once per drive per day, and carries a now-line
+  ---
+  duration_ms: 13.57725
+  type: 'test'
+  ...
+# Subtest: emotion shift: low held 30 min fires once, recovery fires once, 2h gap between
+ok 189 - emotion shift: low held 30 min fires once, recovery fires once, 2h gap between
+  ---
+  duration_ms: 2.976125
+  type: 'test'
+  ...
+# Subtest: quiet hours and the daily cap block signals; wake residue fires once per dream
+ok 190 - quiet hours and the daily cap block signals; wake residue fires once per dream
+  ---
+  duration_ms: 1.262292
+  type: 'test'
+  ...
+# Subtest: awareness digest goes out once on the review day only
+ok 191 - awareness digest goes out once on the review day only
+  ---
+  duration_ms: 5.192541
+  type: 'test'
+  ...
+# Subtest: a drive parked at its ceiling is a flat line, not a surge: no drive_peak
+ok 192 - a drive parked at its ceiling is a flat line, not a surge: no drive_peak
+  ---
+  duration_ms: 0.343875
+  type: 'test'
+  ...
+# Subtest: a promoted obsession is announced once
+ok 193 - a promoted obsession is announced once
+  ---
+  duration_ms: 0.334792
+  type: 'test'
+  ...
+# Subtest: drive peak signals carry a response hint: self-serve drives say how to report, relational ones say wait for her
+ok 194 - drive peak signals carry a response hint: self-serve drives say how to report, relational ones say wait for her
+  ---
+  duration_ms: 0.158625
+  type: 'test'
+  ...
+# Subtest: 3.3.6 念头回推不越过 0.85
+ok 195 - 3.3.6 念头回推不越过 0.85
+  ---
+  duration_ms: 12.911791
+  type: 'test'
+  ...
+# Subtest: 3.3.6 同一个念头只回推一次，寿命仍是三次结算
+ok 196 - 3.3.6 同一个念头只回推一次，寿命仍是三次结算
+  ---
+  duration_ms: 0.677459
+  type: 'test'
+  ...
+# Subtest: output reflux keeps source OB references without breaking the old call shape
+ok 197 - output reflux keeps source OB references without breaking the old call shape
+  ---
+  duration_ms: 2.224208
+  type: 'test'
+  ...
+# Subtest: a promoted obsession keeps the concrete memory it grew from
+ok 198 - a promoted obsession keeps the concrete memory it grew from
+  ---
+  duration_ms: 0.241334
+  type: 'test'
+  ...
+# Subtest: surfaced memories seed flash thoughts and repeated surfacing reinforces the same drive
+ok 199 - surfaced memories seed flash thoughts and repeated surfacing reinforces the same drive
+  ---
+  duration_ms: 0.456875
+  type: 'test'
+  ...
+# Subtest: surfaced thoughts decay slowly enough to survive until the next surfacing, then promote
+ok 200 - surfaced thoughts decay slowly enough to survive until the next surfacing, then promote
+  ---
+  duration_ms: 0.246166
+  type: 'test'
+  ...
+# Subtest: package and runtime versions stay aligned
+ok 201 - package and runtime versions stay aligned
+  ---
+  duration_ms: 2.553584
+  type: 'test'
+  ...
+1..201
+# tests 201
+# suites 0
+# pass 201
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2294.15025

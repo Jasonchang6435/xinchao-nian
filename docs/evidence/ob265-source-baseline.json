@@ -1,0 +1,84 @@
+{
+  "obImage": "xinchao-risk-ob265:vendored",
+  "heartImage": "xinchao-external-ob:dev",
+  "productionContacted": false,
+  "legacySourceBaseline": true,
+  "heartScenarioUid": 1000,
+  "modelProvider": "deterministic local fixture, not a real model quality benchmark",
+  "rounds": [
+    {
+      "stage": "prepare",
+      "checks": [
+        {
+          "name": "real_OB_OAuth_DCR_PKCE_and_gateway_OAuth_without_memory_writes",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "stage": "verify-readonly",
+      "checks": [
+        {
+          "name": "DRYRUN_test_target_readonly_gateway_blocks_writes_before_real_OB",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "stage": "legacy-round",
+      "checks": [
+        {
+          "name": "real_OB265_main_extra_and_missing_advanced_search_baseline",
+          "passed": true
+        },
+        {
+          "name": "real_OB265_Dashboard_renders_wiki_without_brackets",
+          "passed": true
+        },
+        {
+          "name": "real_OB265_automatic_candidate_gate_does_not_write_first_technical_candidate",
+          "passed": true
+        },
+        {
+          "name": "real_OB265_I_writes_formal_item_directly",
+          "passed": true
+        },
+        {
+          "name": "real_OB265_soft_delete_and_restore_baseline",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "stage": "verify-restored",
+      "checks": [
+        {
+          "name": "restored_OB_and_heart_boot_with_history_sources_and_both_OAuth_grants",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "stage": "verify-baseline",
+      "checks": [
+        {
+          "name": "baseline_rollback_boot_has_only_original_history_and_matching_OAuth_grants",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "restoredSqliteChecks": {
+    "restored-ob": {
+      "embeddings.db": "ok",
+      "dehydration_cache.db": "ok"
+    },
+    "rollback-ob": {
+      "embeddings.db": "ok",
+      "dehydration_cache.db": "ok"
+    }
+  },
+  "fullDirectoryBackupsVerifiedAndRestored": true,
+  "baselineRestoredToNewDirectories": true,
+  "completed": true
+}

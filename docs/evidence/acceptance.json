@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-09",
+  "branch": "codex/zeabur-external-ob",
+  "nodeTests": {
+    "passed": 201,
+    "failed": 0
+  },
+  "snapshotTests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "realOb32Checks": 46,
+  "heartScenarioUid": 1000,
+  "productionDeploymentPerformed": false,
+  "productionWritesPerformed": false,
+  "productionDataRecovered": false,
+  "onlineProductUIVerified": false,
+  "sourceHashes": {
+    "xinchao/src/config.js": "0d3b23894d840ece121530a5c988dd5779443caacfc9e7236698e66d36e4dac0",
+    "xinchao/src/ob32-adapter.js": "fe74d1f35916eb55c82dc7acd1748480886d4ac31622f405e414897d9dc4364c",
+    "xinchao/src/server.js": "4e79574137c33c837f36c1931403001fd5c28d977a7e6cb4d1ceb45f36fc08b6",
+    "tools/lab/run.py": "a6d20c03625afc058d71e112652a05d004d2cbe0da51d79ca841b4575c2f2683",
+    "tools/lab/scenarios.mjs": "42c7fa49ace13f1bcf7a94cecf9ffe9bad048378bede69328661753ef0351f6a",
+    "tools/vault_snapshot.py": "efa6f0be20991f9cd8891d2f9967213e7b4cd42edd32c174c750a3f4f128eb1b"
+  },
+  "images": {
+    "heart": {
+      "id": "sha256:cb38070c8d97de603b6b0ac883ab91eb6df8b33e85e020387b949c22dca64702",
+      "os": "linux",
+      "architecture": "arm64"
+    },
+    "ob32": {
+      "id": "sha256:036829ca6e73af1bd0a0cbe40b11cc419f124117271c12fdd53f348b0d661f9d",
+      "os": "linux",
+      "architecture": "arm64"
+    },
+    "legacySourceBaseline": {
+      "id": "sha256:c470381801bb7e023f5ba1af0a147a71b0c00de13971a3f156d672c1048fff4a",
+      "os": "linux",
+      "architecture": "arm64"
+    }
+  },
+  "legacySourceChecks": 9
+}

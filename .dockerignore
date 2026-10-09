@@ -1,0 +1,15 @@
+.git
+ombre-brain
+bridge
+docs
+*.zip
+**/.env
+**/.env.*
+**/.private
+**/state
+**/memory-data
+**/node_modules
+**/test
+**/*.log
+xinchao/configs/interaction-rules.json
+xinchao/configs/attention-rules.json

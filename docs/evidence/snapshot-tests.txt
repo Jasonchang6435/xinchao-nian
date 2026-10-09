@@ -1,0 +1,12 @@
+test_content_corruption_rejected_before_restore (test_vault_snapshot.SnapshotTests.test_content_corruption_rejected_before_restore) ... ok
+test_existing_restore_destination_never_overwritten (test_vault_snapshot.SnapshotTests.test_existing_restore_destination_never_overwritten) ... ok
+test_full_directory_roundtrip_and_baseline_recovery (test_vault_snapshot.SnapshotTests.test_full_directory_roundtrip_and_baseline_recovery) ... ok
+test_missing_source_member_rejected (test_vault_snapshot.SnapshotTests.test_missing_source_member_rejected) ... ok
+test_requires_quiescence_and_archive_outside_source (test_vault_snapshot.SnapshotTests.test_requires_quiescence_and_archive_outside_source) ... ok
+test_symlink_source_refused (test_vault_snapshot.SnapshotTests.test_symlink_source_refused) ... ok
+test_traversal_and_receipt_mismatch_rejected (test_vault_snapshot.SnapshotTests.test_traversal_and_receipt_mismatch_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.053s
+
+OK

@@ -2,6 +2,14 @@
 // 代码地图见 src/README.md。
 
 import { SYSTEM_VERSION } from './version.js';
+import { ObAuth } from './ob-auth.js';
+
+export const OB_READ_TOOLS = new Set(['breath', 'breath_search', 'breath_advanced', 'pulse', 'dream', 'feel', 'letter_read']);
+export function isObWrite(name, args = {}) {
+  if (OB_READ_TOOLS.has(name)) return false;
+  if (name === 'I') return Boolean(args.content || args.promote);
+  return true;
+}
 
 // 梦不吃技术：这些域的记忆不进梦的原料（机房梦就是这么来的）
 const DREAM_EXCLUDE_DOMAINS = new Set(['技术', '数字', '编程', '事务']);
@@ -11,6 +19,8 @@ export class OmbreClient {
     this.config = config;
     this.sessionId = null;
     this.initializePromise = null;
+    this.auth = new ObAuth(config);
+    this.nextId = 1;
   }
 
   async post(payload, expectBody = true, timeoutMs = 15000) {
@@ -19,18 +29,28 @@ export class OmbreClient {
       Accept: 'application/json, text/event-stream',
       'X-Ombre-Caller': 'dynamic-mind',
     };
-    if (this.config.token) headers.Authorization = `Bearer ${this.config.token}`;
+    const token = await this.auth.token();
+    if (token) headers.Authorization = `Bearer ${token}`;
     if (this.sessionId) headers['Mcp-Session-Id'] = this.sessionId;
-    const response = await fetch(this.config.url, {
+    const options = {
       method: 'POST', headers,
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(timeoutMs)
-    });
+      signal: AbortSignal.timeout(timeoutMs), redirect: 'error',
+    };
+    let response = await fetch(this.config.url, options);
+    // A 401 rejects the request before execution; this is the only OAuth retry.
+    if (response.status === 401 && this.config.authMode === 'oauth') {
+      headers.Authorization = `Bearer ${await this.auth.refreshRejected(token)}`;
+      response = await fetch(this.config.url, { ...options, signal: AbortSignal.timeout(timeoutMs) });
+    }
     if (!response.ok) throw new Error(`Ombre MCP failed: HTTP ${response.status}`);
     this.sessionId = response.headers.get('mcp-session-id') ?? this.sessionId;
     if (!expectBody) return null;
     const text = await response.text();
-    return text ? parseMcp(text) : null;
+    const parsed = text ? parseMcp(text, payload.id) : null;
+    if (parsed?.error) throw new Error(`Ombre RPC error ${parsed.error.code}: ${String(parsed.error.message).slice(0, 300)}`);
+    if (parsed?.result?.isError || parsed?.isError) throw new Error(`Ombre tool failed: ${extractText(parsed).slice(0, 300)}`);
+    return parsed;
   }
 
   async initialize() {
@@ -39,7 +59,7 @@ export class OmbreClient {
       this.initializePromise = (async () => {
         await this.post({
           jsonrpc: '2.0',
-          id: Date.now(),
+          id: this.nextId++,
           method: 'initialize',
           params: {
             protocolVersion: '2025-06-18',
@@ -56,12 +76,16 @@ export class OmbreClient {
   }
 
   async call(name, args = {}, timeoutMs = 15000) {
+    const writes = isObWrite(name, args);
+    if (writes && this.config.writeEnabled === false) throw new Error('ombre_write_disabled');
+    if (!writes && this.config.readEnabled === false) throw new Error('ombre_read_disabled');
     for (let attempt = 0; attempt < 2; attempt += 1) {
       await this.initialize();
       try {
-        return await this.post({ jsonrpc: '2.0', id: Date.now(), method: 'tools/call', params: { name, arguments: args } }, true, timeoutMs);
+        return await this.post({ jsonrpc: '2.0', id: this.nextId++, method: 'tools/call', params: { name, arguments: args } }, true, timeoutMs);
       } catch (error) {
-        if (attempt || !/HTTP (400|401|404)/.test(error.message)) throw error;
+        // Never replay a write after a timeout, transport error or ambiguous 400.
+        if (attempt || !(writes ? /HTTP 404/.test(error.message) : /HTTP (400|401|404)/.test(error.message))) throw error;
         this.sessionId = null;
         this.stateless = false;
       }
@@ -76,7 +100,7 @@ export class OmbreClient {
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         await this.initialize();
-        const raw = await this.post({ jsonrpc: '2.0', id: Date.now(), method: 'tools/list', params: {} });
+        const raw = await this.post({ jsonrpc: '2.0', id: this.nextId++, method: 'tools/list', params: {} });
         return raw?.result?.tools ?? raw?.tools ?? [];
       } catch (error) {
         this.sessionId = null;
@@ -345,12 +369,16 @@ export class OmbreClient {
       source: 'xinchao-dream',
     });
     const text = extractText(result);
-    const bucketId = text.match(/[a-f0-9]{12,}/i)?.[0] ?? null;
+    const bucketId = parseGrowBucketIds(text)[0] ?? null;
     // 梦是睡眠结算的残渣，不该作为真实记忆回到 breath（否则下次梦引擎会把旧梦当素材捞出 → 梦吃梦）。
+    if (!bucketId) throw new Error('OB dream write returned no verifiable bucket ID; do not repeat the write blindly');
     // 出生即标 dont_surface=1：仍存在 OB、仍显示在梦境页（来自心潮 state），但不进 breath 召回。
     if (bucketId) {
-      try { await this.call('trace', { bucket_id: bucketId, dont_surface: 1 }); }
-      catch (error) { /* best-effort：标记失败不阻断存梦本身 */ }
+      try {
+        const trace = await this.call('trace', { bucket_id: bucketId, dont_surface: 1 });
+        if (/^(未找到记忆桶|修改失败|错误)/.test(extractText(trace).trim())) throw new Error('trace did not apply dont_surface');
+      }
+      catch (error) { throw new Error(`Dream stored (${bucketId}) but dont_surface failed; do not repeat hold: ${error.message}`); }
     }
     return bucketId;
   }
@@ -479,12 +507,25 @@ export function parseGrowBucketIds(text) {
   return ids;
 }
 
-function parseMcp(text) {
-  const data = text.split('\n').find((line) => line.startsWith('data:'))?.slice(5).trim() ?? text;
-  return JSON.parse(data);
+export function parseMcp(text, expectedId) {
+  const source = String(text).trim();
+  if (source.startsWith('{')) {
+    const message = JSON.parse(source);
+    if (expectedId != null && message.id !== expectedId) throw new Error('Ombre returned a mismatched JSON-RPC response');
+    return message;
+  }
+  // SSE can contain keepalives/notifications and several JSON-RPC messages.
+  const messages = source.split(/\r?\n\r?\n/).flatMap((event) => {
+    const data = event.split(/\r?\n/).filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trimStart()).join('\n');
+    if (!data || data === '[DONE]') return [];
+    return [JSON.parse(data)];
+  });
+  const result = messages.find((message) => (expectedId == null || message.id === expectedId) && ('result' in message || 'error' in message));
+  if (!result) throw new Error('Ombre returned no matching JSON-RPC response');
+  return result;
 }
 
-function extractText(result) {
+export function extractText(result) {
   const content = result?.result?.content ?? result?.content ?? [];
   return content.filter((part) => part.type === 'text').map((part) => part.text).join('\n');
 }

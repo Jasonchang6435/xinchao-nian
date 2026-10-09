@@ -1,6 +1,8 @@
 // 【服务底座】读环境变量：所有可调的开关和数值都从 .env 进来，对照 .env.example 看。
 // 代码地图见 src/README.md。
 
+import { resolve } from 'node:path';
+
 function bool(name, fallback = false) {
   const raw = process.env[name];
   return raw == null ? fallback : ['1', 'true', 'yes', 'on'].includes(raw.toLowerCase());
@@ -13,22 +15,35 @@ function number(name, fallback, min, max) {
 }
 
 export function loadConfig() {
+  const dryRunRaw = process.env.DRYRUN;
+  if (dryRunRaw != null && !['true', 'false', '1', '0'].includes(dryRunRaw.trim().toLowerCase())) {
+    throw new Error('DRYRUN must be true or false (or 1/0)');
+  }
+  const dryRun = dryRunRaw == null || ['true', '1'].includes(dryRunRaw.trim().toLowerCase());
+  // Select an entire credential/endpoint namespace. Never fall back to live OB.
+  const obPrefix = dryRun ? 'OMBRE_TEST_' : 'OMBRE_';
+  const obEnv = (suffix, fallback = '') => process.env[obPrefix + suffix] ?? fallback;
+  const obBool = (suffix, fallback = false) => bool(obPrefix + suffix, fallback);
+  const stateEnv = (name, filename) => dryRun
+    ? process.env['TEST_' + name] ?? '/app/state/test/' + filename
+    : process.env[name] ?? '/app/state/' + filename;
   const agentName = process.env.AGENT_NAME ?? 'AI 助手';
   // 默认值会直接出现在推送和桥消息里被本人读到，所以不用「用户」这种后台称呼。
   // 自己部署的人应该设成对方真正的名字，这只是没设时的兜底。
   const notificationRecipient = process.env.NOTIFICATION_RECIPIENT ?? '你的人类';
   return {
+    dryRun,
     identity: { agentName, notificationRecipient },
     port: number('PORT', 18110, 1, 65535),
     serviceToken: process.env.SERVICE_TOKEN ?? '',
-    statePath: process.env.STATE_PATH ?? '/app/state/state.json',
-    personalityPath: process.env.PERSONALITY_PATH ?? '/app/state/personality.json',
+    statePath: stateEnv('STATE_PATH', 'state.json'),
+    personalityPath: stateEnv('PERSONALITY_PATH', 'personality.json'),
     personality: {
       // Optional presentation metadata only. Scores and reasons still come
       // exclusively from the deployment-side, read-only personality mirror.
       zodiac: String(process.env.PERSONALITY_ZODIAC ?? '').trim() || null,
     },
-    journalPath: process.env.TRANSITION_JOURNAL_PATH ?? '/app/state/transitions.jsonl',
+    journalPath: stateEnv('TRANSITION_JOURNAL_PATH', 'transitions.jsonl'),
     settleIntervalMinutes: number('SETTLE_INTERVAL_MINUTES', 15, 1, 1440),
     sleepAfterMinutes: number('SLEEP_AFTER_MINUTES', 90, 5, 10080),
     shadowMode: bool('SHADOW_MODE', true),
@@ -48,10 +63,24 @@ export function loadConfig() {
     dreamMaxPerDay: number('DREAM_MAX_PER_DAY', 4, 1, 12),
     dreamEnabled: bool('DREAM_ENABLED', true),
     ombre: {
-      url: process.env.OMBRE_MCP_URL ?? '',
-      token: process.env.OMBRE_MCP_TOKEN ?? '',
+      target: dryRun ? 'test' : 'live',
+      url: obEnv('MCP_URL', ''),
+      token: obEnv('MCP_TOKEN', ''),
+      adapter: process.env.OMBRE_ADAPTER ?? 'native',
+      extraUrl: obEnv('MCP_EXTRA_URL', ''),
+      authMode: obEnv('AUTH_MODE', 'token'),
+      oauthStatePath: obEnv('OAUTH_STATE_PATH', dryRun ? '/app/state/ob-test-oauth.json' : '/app/state/ob-oauth.json'),
+      oauthClientId: obEnv('OAUTH_CLIENT_ID', ''),
+      oauthRefreshToken: obEnv('OAUTH_REFRESH_TOKEN', ''),
+      oauthTokenUrl: obEnv('OAUTH_TOKEN_URL', ''),
+      oauthResource: obEnv('OAUTH_RESOURCE', ''),
+      dashboardBaseUrl: obEnv('DASHBOARD_BASE_URL', ''),
+      dashboardPassword: obEnv('DASHBOARD_PASSWORD', ''),
+      dashboardSession: obEnv('DASHBOARD_SESSION', ''),
       readEnabled: bool('OMBRE_READ_ENABLED', false),
-      writeEnabled: bool('OMBRE_WRITE_ENABLED', false),
+      writeEnabled: obBool('WRITE_ENABLED', false),
+      dreamWriteEnabled: obBool('DREAM_WRITE_ENABLED', false),
+      allowDestructiveWrites: obBool('ALLOW_DESTRUCTIVE_WRITES', false),
       breathMaxResults: number('OMBRE_BREATH_MAX_RESULTS', 3, 1, 10),
       breathMaxTokens: number('OMBRE_BREATH_MAX_TOKENS', 800, 200, 3000),
       // 3.3：把此刻情绪坐标带给 breath（共振排序）和没自带坐标的 hold（情感标签）。
@@ -76,7 +105,7 @@ export function loadConfig() {
       enabled: bool('OAUTH_ENABLED', false),
       publicBaseUrl: (process.env.OAUTH_PUBLIC_BASE_URL ?? '').replace(/\/$/, ''),
       approvalToken: process.env.OAUTH_APPROVAL_TOKEN ?? '',
-      statePath: process.env.OAUTH_STATE_PATH ?? '/app/state/oauth.json',
+      statePath: stateEnv('OAUTH_STATE_PATH', 'oauth.json'),
       accessTtlSeconds: number('OAUTH_ACCESS_TTL_SECONDS', 86400, 300, 2592000),
       refreshTtlSeconds: number('OAUTH_REFRESH_TTL_SECONDS', 31536000, 86400, 63072000),
     },
@@ -103,7 +132,7 @@ export function loadConfig() {
     bridge: {
       enabled: bool('BRIDGE_ENABLED', false),
       machineToken: process.env.BRIDGE_MACHINE_TOKEN ?? '',
-      statePath: process.env.BRIDGE_STATE_PATH ?? '/app/state/bridge-queue.json',
+      statePath: stateEnv('BRIDGE_STATE_PATH', 'bridge-queue.json'),
       maxEntries: number('BRIDGE_MAX_ENTRIES', 500, 10, 5000),
       ttlHours: number('BRIDGE_TTL_HOURS', 168, 1, 720),
       pollSeconds: number('BRIDGE_POLL_SECONDS', 15, 2, 300),
@@ -112,12 +141,12 @@ export function loadConfig() {
     },
     // 黑匣子（3.3）：只有 AI 能看的地方；单独文件，不进 state.json / Dashboard / 备份
     box: {
-      statePath: process.env.BOX_STATE_PATH ?? '/app/state/black-box.json',
+      statePath: stateEnv('BOX_STATE_PATH', 'black-box.json'),
     },
     // 从 tools/list 里藏掉的工具（代码保留）。stats 是给 Dashboard 的。
     toolsHide: new Set(String(process.env.XINCHAO_TOOLS_HIDE ?? 'xinchao_personality_stats').split(',').map((s) => s.trim()).filter(Boolean)),
     cabin: {
-      statePath: process.env.CABIN_STATE_PATH ?? '/app/state/cabin.json',
+      statePath: stateEnv('CABIN_STATE_PATH', 'cabin.json'),
       maxNotes: number('CABIN_MAX_NOTES', 2000, 10, 10000),
       maxLedgerEntries: number('CABIN_MAX_LEDGER_ENTRIES', 5000, 10, 20000),
     },
@@ -205,6 +234,28 @@ export function loadConfig() {
 }
 
 export function validateConfig(config) {
+  if (config.dryRun) {
+    const stateFiles = [[config.statePath, 'STATE_PATH', 'state.json'], [config.personalityPath, 'PERSONALITY_PATH', 'personality.json'],
+      [config.journalPath, 'TRANSITION_JOURNAL_PATH', 'transitions.jsonl'], [config.oauth.statePath, 'OAUTH_STATE_PATH', 'oauth.json'],
+      [config.box.statePath, 'BOX_STATE_PATH', 'black-box.json'], [config.cabin.statePath, 'CABIN_STATE_PATH', 'cabin.json'],
+      [config.bridge.statePath, 'BRIDGE_STATE_PATH', 'bridge-queue.json']];
+    for (const [testPath, name, filename] of stateFiles) {
+      if (resolve(testPath) === resolve(process.env[name] ?? '/app/state/' + filename)) throw new Error('DRYRUN must use a separate test heart state file: ' + name);
+    }
+    // Refuse accidental aliases to live endpoints, even with another MCP path.
+    const liveUrls = ['MCP_URL', 'MCP_EXTRA_URL', 'DASHBOARD_BASE_URL', 'OAUTH_TOKEN_URL', 'OAUTH_RESOURCE']
+      .map((suffix) => process.env['OMBRE_' + suffix]).filter(Boolean);
+    const testUrls = [config.ombre.url, config.ombre.extraUrl, config.ombre.dashboardBaseUrl,
+      config.ombre.oauthTokenUrl, config.ombre.oauthResource].filter(Boolean);
+    for (const testUrl of testUrls) for (const liveUrl of liveUrls) {
+      if (new URL(testUrl).origin === new URL(liveUrl).origin) {
+        throw new Error('DRYRUN test and live OB must use different origins AND independent data volumes');
+      }
+    }
+    if (resolve(config.ombre.oauthStatePath) === resolve(process.env.OMBRE_OAUTH_STATE_PATH ?? '/app/state/ob-oauth.json')) {
+      throw new Error('DRYRUN must use a separate test OB OAuth state file');
+    }
+  }
   // 常见踩坑：配了 OB 地址却没打开 read —— OB 明明部署好了，网页端（xinchaomind.uk）
   // 却一直显示"未接入 OB / 记忆星图不可用"。这不是报错（标准部署可以没有 OB），
   // 但配了地址却没开 read 几乎一定是漏配，所以在这里明确告警，省得反复排查。
@@ -224,10 +275,12 @@ export function validateConfig(config) {
   if (externalMemoryEnabled) {
     if (!String(config.ombre.url || '').trim()) {
       throw new Error(
-        'OMBRE_MCP_URL is required when external memory integration is enabled'
+        `${config.dryRun ? 'OMBRE_TEST_MCP_URL' : 'OMBRE_MCP_URL'} is required when external memory integration is enabled; DRYRUN never falls back to live OB`
       );
     }
-    if (!String(config.ombre.token || '').trim()) {
+    if (!['native', 'ob32'].includes(config.ombre.adapter ?? 'native')) throw new Error('OMBRE_ADAPTER must be native or ob32');
+    if (!['token', 'oauth'].includes(config.ombre.authMode ?? 'token')) throw new Error('OMBRE_AUTH_MODE must be token or oauth');
+    if (config.ombre.authMode !== 'oauth' && !String(config.ombre.token || '').trim()) {
       throw new Error(
         'OMBRE_MCP_TOKEN is required when external memory integration is enabled'
       );
