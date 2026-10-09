@@ -27,8 +27,13 @@ for name,port,volume in [('ombre',8000,'/app/buckets'),('xinchao',18110,'/app/st
  assert s['spec']['volumes'][0]['dir']==volume
  assert s['spec']['healthCheck']['http']['path']=='/health'
  assert (root/('Dockerfile.'+name)).exists()
+ assert json.loads((root/('zbpack.'+name+'.json')).read_text())=={'dockerfile':{'path':'Dockerfile.'+name}}
 assert services['xinchao']['dependencies']==['ombre']
 env=services['xinchao']['spec']['env']
+assert env['OAUTH_PUBLIC_BASE_URL']['default']=='https://${ZEABUR_WEB_DOMAIN}'
+assert env['DASHBOARD_PUBLIC_BASE_URL']['default']=='https://${ZEABUR_WEB_DOMAIN}'
+assert 'https://${PUBLIC_DOMAIN}' not in (root/'zeabur-template.yaml').read_text()
+assert 'https://${OB_DOMAIN}' not in (root/'zeabur-template.yaml').read_text()
 assert env['MCP_ENABLED']['default']=='false' and env['OAUTH_ENABLED']['default']=='false'
 assert env['OMBRE_WRITE_ENABLED']['default']=='false' and env['SHADOW_MODE']['default']=='true'
 assert env['OMBRE_MCP_TOKEN']['default']=='${OMBRE_MCP_SERVICE_TOKEN}'

@@ -113,9 +113,9 @@ spec:
             default: ${CONTAINER_HOSTNAME}
             expose: true
         instructions:
-          - type: DOMAIN
+          - type: TEXT
             title: 新 OB Dashboard
-            content: https://${OB_DOMAIN}
+            content: https://${ZEABUR_WEB_DOMAIN}
     - name: xinchao
       template: GIT
       domainKey: PUBLIC_DOMAIN
@@ -168,13 +168,13 @@ spec:
           OAUTH_ENABLED:
             default: 'false'
           OAUTH_PUBLIC_BASE_URL:
-            default: https://${PUBLIC_DOMAIN}
+            default: https://${ZEABUR_WEB_DOMAIN}
           OAUTH_APPROVAL_TOKEN:
             default: ${OAUTH_APPROVAL_TOKEN}
           DASHBOARD_ENABLED:
             default: 'true'
           DASHBOARD_PUBLIC_BASE_URL:
-            default: https://${PUBLIC_DOMAIN}
+            default: https://${ZEABUR_WEB_DOMAIN}
           DASHBOARD_ACCESS_TOKEN:
             default: ${DASHBOARD_ACCESS_TOKEN}
           DASHBOARD_ALLOWED_ORIGINS:
@@ -191,12 +191,12 @@ spec:
             default: ${CONTAINER_HOSTNAME}
             expose: true
         instructions:
-          - type: DOMAIN
+          - type: TEXT
             title: 心潮健康检查
-            content: https://${PUBLIC_DOMAIN}/health
+            content: https://${ZEABUR_WEB_DOMAIN}/health
           - type: TEXT
             title: 心潮 MCP（验收时开启后使用）
-            content: https://${PUBLIC_DOMAIN}/mcp
+            content: https://${ZEABUR_WEB_DOMAIN}/mcp
           - type: TEXT
             title: 公开可视化连接
-            content: 在 https://xinchaomind.uk 填 https://${PUBLIC_DOMAIN} 和自己的 Dashboard 口令。
+            content: 在 https://xinchaomind.uk 填 https://${ZEABUR_WEB_DOMAIN} 和自己的 Dashboard 口令。

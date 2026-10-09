@@ -11,7 +11,9 @@
 
 心潮通过新 OB 的内网地址 `/mcp` 和独立内部令牌调用记忆。两个卷不共享，不挂载旧生产卷。新实例首启为空库。`bridge/` 是可选的用户本地 Runtime Bridge，不是云端第三个常驻服务；公开可视化前端仍使用 `https://xinchaomind.uk`，此仓库没有把该网站完整打包进镜像。
 
-Zeabur不直接部署Compose YAML。本仓库的 `zeabur-template.yaml` 一次创建两个 Git/Docker 服务、卷、域名、变量和启动依赖；`compose.zeabur.yaml` 仅供本地Docker验收。根目录Dockerfile名称与服务名匹配，并由 `ZBPACK_DOCKERFILE_PATH` 明确指定，避免被识别成普通Node项目。[官方 Dockerfile 说明](https://zeabur.com/docs/en-US/deploy/methods/dockerfile)
+Zeabur不直接部署Compose YAML。本仓库的 `zeabur-template.yaml` 一次创建两个 Git/Docker 服务、卷、域名、变量和启动依赖；`compose.zeabur.yaml` 仅供本地Docker验收。
+
+Zeabur 的构建探测（zbpack）只把构建根目录下名为 `Dockerfile` 的文件当成 Docker 项目；本仓库根目录只有 `Dockerfile.ombre` / `Dockerfile.xinchao`，所以当服务名不匹配、又没指定路径时，探测会**回退成 static**，部署就被识别成静态 H5。本分支在根目录提供 `zbpack.ombre.json`、`zbpack.xinchao.json`，分别把名为 `ombre` / `xinchao` 的服务固定到自己的 Dockerfile；模板同时保留 `ZBPACK_DOCKERFILE_PATH` 作为双保险。[官方 Dockerfile 说明](https://zeabur.com/docs/en-US/deploy/methods/dockerfile)
 
 ## 2. 一次创建完整项目
 
@@ -31,7 +33,7 @@ npx zeabur@latest auth login
 npx zeabur@latest template deploy -f zeabur-template.yaml
 ```
 
-按CLI提示选择**新项目**并输入模板变量。域名提示若要求前缀，输入例如 `my-xinchao-new` 与 `my-ob-new`，Zeabur生成 `.zeabur.app` 域名；不要在前缀输入框填 `https://`。创建后核对服务环境中的完整URL应为 `https://你的实际域名`，不是裸前缀。
+按CLI提示选择**新项目**并输入模板变量。域名提示若要求前缀，输入例如 `my-xinchao-new` 与 `my-ob-new`，Zeabur生成 `.zeabur.app` 域名；不要在前缀输入框填 `https://`。心潮的 `OAUTH_PUBLIC_BASE_URL`、`DASHBOARD_PUBLIC_BASE_URL` 用 `${ZEABUR_WEB_DOMAIN}` 自动取实际绑定的完整域名；部署后核对它们是 `https://你的实际域名`。注意 `PUBLIC_DOMAIN` 变量本身只有前缀（官方文档明确 `https://${PUBLIC_DOMAIN}` 会得到 `https://myapp` 这种不完整URL），不要拿它拼公开地址。
 
 模板使用官方当前Schema的Git源结构 `spec.source.source=GITHUB`、数字 `repo=1410500658`，绑定本分支。不同仓库或新的fork需要修改两处repo ID和branch。模板会创建新资源，**不要把这条命令用于旧OB项目**。
 
@@ -63,12 +65,14 @@ CLI命令依据：[Zeabur官方CLI实现](https://github.com/zeabur/cli/blob/mai
 若模板导入受到平台版本或权限限制，可在同一新项目手工建两个Git服务：
 
 1. 两个服务都选择本仓库、分支 `codex/zeabur-full-stack`，Root Directory留空（仓库根目录）。不要选 `xinchao/` 或 `ombre-brain/` 子目录，因为新Dockerfile使用根目录COPY路径。
-2. `ombre` 设置 `ZBPACK_DOCKERFILE_PATH=Dockerfile.ombre`，端口8000，卷挂 `/app/buckets`，健康检查 `/health`。
-3. `xinchao` 设置 `ZBPACK_DOCKERFILE_PATH=Dockerfile.xinchao`，端口18110，卷挂 `/app/state`，健康检查 `/health`。
+2. 服务命名为 `ombre`：根目录 `zbpack.ombre.json` 会让zbpack选中 `Dockerfile.ombre`；再设置 `ZBPACK_DOCKERFILE_PATH=Dockerfile.ombre` 双保险，端口8000，卷挂 `/app/buckets`，健康检查 `/health`。
+3. 服务命名为 `xinchao`：根目录 `zbpack.xinchao.json` 会让zbpack选中 `Dockerfile.xinchao`；再设置 `ZBPACK_DOCKERFILE_PATH=Dockerfile.xinchao` 双保险，端口18110，卷挂 `/app/state`，健康检查 `/health`。
 4. 按两个 `.env.example` 设置环境变量。例子里的 `REPLACE_...` 必须替换。不要上传本地 `.env` 文件。
 5. 将心潮 `OMBRE_MCP_URL` 改成 `http://新OB实际内网主机名:8000/mcp`；将其 `OMBRE_MCP_TOKEN` 填成OB的 `OMBRE_MCP_SERVICE_TOKEN`。
 6. 心潮 `SERVICE_TOKEN` 与OB的 `DYNAMIC_MIND_TOKEN` 相同；若保留反向地址配置，填 `http://心潮实际内网主机名:18110`。当前内置OB源码未实现该环境变量的完整反向状态读取，不能据此声称已实现双向业务闭环。
-7. 绑定两个新HTTPS域名，心潮的OAuth/Dashboard公开基础URL均指向心潮域名，不带 `/mcp` 后缀。部署时确认环境变量引用已经解析。
+7. 绑定两个新HTTPS域名；心潮的 `OAUTH_PUBLIC_BASE_URL`、`DASHBOARD_PUBLIC_BASE_URL` 填 `https://实际心潮域名`（手工建服务不走模板替换，直接填完整域名最稳），不带 `/mcp` 后缀。部署时确认环境变量引用已经解析。
+
+如果某个Git服务已经建好、却显示为静态（static）站点：通常是zbpack没有选中根目录的非标准Dockerfile。把该服务补上 `ZBPACK_DOCKERFILE_PATH`（`Dockerfile.ombre` 或 `Dockerfile.xinchao`），确认服务名与根目录 `zbpack.<服务名>.json` 一致，然后重新部署（Redeploy）即可，不必重建项目。
 
 模板通过两服务暴露的 `OB_INTERNAL_HOST` / `XINCHAO_INTERNAL_HOST` 和 `${CONTAINER_HOSTNAME}` 配置内网地址。实际内网主机名以Zeabur“网络→私有”显示为准；重命名服务不一定改变主机名。[官方内网说明](https://zeabur.com/docs/en-US/deploy/networking/private-networking)
 
