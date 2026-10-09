@@ -18,16 +18,17 @@ spec=yaml.safe_load((root/'zeabur-template.yaml').read_text())
 Draft7Validator(schema,registry=registry).validate(spec)
 services={s['name']:s for s in spec['spec']['services']}
 assert set(services)=={'ombre','xinchao'}
-for name,port,volume in [('ombre',8000,'/app/buckets'),('xinchao',18110,'/app/state')]:
+assert (root/'Dockerfile').exists()
+for name,port,volume,dockerfile in [('ombre',8000,'/app/buckets','Dockerfile.ombre'),('xinchao',18110,'/app/state','Dockerfile')]:
  s=services[name];env=s['spec']['env'];source=s['spec']['source']
  assert s['template']=='GIT' and source['source']=='GITHUB'
  assert source['repo']==1410500658 and source['branch']=='codex/zeabur-full-stack'
- assert env['ZBPACK_DOCKERFILE_PATH']['default']=='Dockerfile.'+name
+ assert env['ZBPACK_DOCKERFILE_PATH']['default']==dockerfile
  assert s['spec']['ports']==[{'id':'web','port':port,'type':'HTTP'}]
  assert s['spec']['volumes'][0]['dir']==volume
  assert s['spec']['healthCheck']['http']['path']=='/health'
- assert (root/('Dockerfile.'+name)).exists()
- assert json.loads((root/('zbpack.'+name+'.json')).read_text())=={'dockerfile':{'path':'Dockerfile.'+name}}
+ assert (root/dockerfile).exists()
+ assert json.loads((root/('zbpack.'+name+'.json')).read_text())=={'dockerfile':{'path':dockerfile}}
 assert services['xinchao']['dependencies']==['ombre']
 env=services['xinchao']['spec']['env']
 assert env['OAUTH_PUBLIC_BASE_URL']['default']=='https://${ZEABUR_WEB_DOMAIN}'

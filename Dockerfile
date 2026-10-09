@@ -1,4 +1,5 @@
-# Build from the repository root: docker build -f Dockerfile.xinchao .
+# 仓库默认构建（Zeabur 自动探测用）：心潮服务。构建：docker build .
+# OB 服务用 Dockerfile.ombre（模板或 ZBPACK_DOCKERFILE_PATH=Dockerfile.ombre）。
 ARG NODE_IMAGE=node:22-alpine
 FROM ${NODE_IMAGE}
 WORKDIR /app

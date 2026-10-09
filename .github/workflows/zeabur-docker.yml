@@ -2,6 +2,7 @@ name: Zeabur Docker deployment checks
 on:
   pull_request:
     paths:
+      - 'Dockerfile'
       - 'Dockerfile.*'
       - '.dockerignore'
       - 'zeabur-template.yaml'
@@ -23,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build both deployment images
         run: |
-          docker build -f Dockerfile.xinchao -t xinchao-zeabur-heart:20261009 .
+          docker build -f Dockerfile -t xinchao-zeabur-heart:20261009 .
           docker build -f Dockerfile.ombre -t xinchao-zeabur-ombre:20261009 .
       - name: Validate official template schemas
         run: |

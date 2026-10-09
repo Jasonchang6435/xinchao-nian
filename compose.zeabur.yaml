@@ -12,7 +12,7 @@ services:
   xinchao:
     build:
       context: .
-      dockerfile: Dockerfile.xinchao
+      dockerfile: Dockerfile
     env_file: deploy/zeabur/xinchao.env
     volumes:
       - heart-state:/app/state

@@ -125,7 +125,7 @@ spec:
           source: GITHUB
           repo: 1410500658
           branch: codex/zeabur-full-stack
-          watchPaths: [Dockerfile.xinchao, xinchao, deploy/zeabur/xinchao-entrypoint.sh]
+          watchPaths: [Dockerfile, xinchao, deploy/zeabur/xinchao-entrypoint.sh]
         ports:
           - id: web
             port: 18110
@@ -140,7 +140,7 @@ spec:
             path: /health
         env:
           ZBPACK_DOCKERFILE_PATH:
-            default: Dockerfile.xinchao
+            default: Dockerfile
           PORT:
             default: '18110'
           SERVICE_TOKEN:
