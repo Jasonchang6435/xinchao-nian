@@ -954,7 +954,7 @@ async function classifyExchange(event, source = 'api') {
   } catch (error) { log('interaction_classify_failed', { message: error.message }); return null; }
 }
 
-async function recordConversationEvent(event, source = 'api', now = new Date()) {
+async function recordConversationEvent(event, source = 'api', now = new Date(), { presence } = {}) {
   let applied;
   const auditDetails = {};
   const driveBias = await personality.getDriveBias(now);
@@ -969,8 +969,9 @@ async function recordConversationEvent(event, source = 'api', now = new Date()) 
     applied = settleAndApplyConversationEvent(current, event, now, {
       // 3.3.10：AI 自己带着互动类型回传、又没附她原话（exchange）的 MCP 事件，只改驱力、不叫醒、不计作息。
       // 不带类型的裸事件是客户端钩子在她每条消息时发的"她来了"信号（通话里她说的每句也走这里），照旧算在场。
-      presence: (source !== 'mcp' && source !== 'attention') || Boolean(String(event.exchange ?? '').trim())
-        || !String(event.interactionType ?? event.interaction_type ?? '').trim(),
+      presence: typeof presence === 'boolean' ? presence
+        : (source !== 'mcp' && source !== 'attention') || Boolean(String(event.exchange ?? '').trim())
+          || !String(event.interactionType ?? event.interaction_type ?? '').trim(),
       sleepAfterMinutes: config.sleepAfterMinutes,
       settle: { ...config.settle, driveBias },
       interaction: config.interaction,
@@ -1414,8 +1415,13 @@ const server = createServer(async (request, response) => {
             gated = declared;
             event.interactionType = ''; delete event.interaction_type;
           }
+          // classifyExchange removes private text before persistence. Capture
+          // presence first so a classified real exchange still wakes the mind
+          // and refreshes lastConversationAt/lastHeartbeatAt.
+          const presence = Boolean(String(event.exchange ?? '').trim())
+            || !String(event.interactionType ?? event.interaction_type ?? '').trim();
           await classifyExchange(event, 'mcp');
-          const result = await recordConversationEvent(event, 'mcp');
+          const result = await recordConversationEvent(event, 'mcp', new Date(), { presence });
           if (gated) {
             result.interaction = { type: gated, applied: false, reasonCode: 'needs_her', affectedDrives: [] };
             log('interaction_self_report_gated', { type: gated });

@@ -107,3 +107,35 @@ DASHBOARD_PUBLIC_BASE_URL=https://xinchao.example.com
 - 不要把任何 token 放进 URL、截图、公开仓库或群聊。
 - `DASHBOARD_ALLOWED_ORIGINS` 只填写实际使用的完整网页来源；不要填写 `*`。
 - 公开 HTTPS 地址仍由 Dashboard 独立口令保护，Cloudflare Tunnel 本身不等于鉴权。
+
+## Claude 网页版：记忆更新但花瓣没有随对话变化
+
+`hold/grow` 只负责 OB 长期记忆。它们不会把保存的文本再当作本轮真实互动，
+也不会自动唤醒心潮或更新花瓣；导入历史资料同样不应改变当前互动状态。
+
+Claude 网页版应在每轮真实互动中回传 `xinchao_event`，需要长期保存时再调用
+`hold/grow`。先回传事件，可以让之后的 `hold` 使用更新后的情绪坐标。
+建议把下面的规则放入专门使用心潮的 Claude 项目指令：
+
+```text
+新会话先调用 xinchao_context，mode=session_start。
+每轮真实对话结束前，用用户本轮真实原话摘录和你的回答要点调用
+xinchao_event，提供唯一 event_id 与 exchange：
+她说：用户本轮真实原话摘录
+他回：你的回答要点
+优先省略 interaction_type，让服务端分类。
+事件重试复用原 event_id，不生成新值，不填写驱力数值。
+需要长期记住的内容按原有 hold/grow 规则归档。
+整理历史资料时不要把其中的经历补报为刚发生的互动。
+分别检查互动回传与记忆归档的实际结果；其中一项成功不代表另一项成功。
+```
+
+验收时先只回传一轮真实互动，不调用记忆写入工具：确认返回的
+`interaction.applied`、`interaction.reasonCode`、`revision` 与
+`consciousness`，再刷新网页并对照相关花瓣。并非每次互动都会改变所有维度；
+默认分类间隔为 8 分钟，还受每日效果上限及类型冷却限制。
+
+`SHADOW_MODE=true` 不阻止真实事件的状态反馈，无需为此切换自动写入模式。
+`SHADOW_MODE`、`OMBRE_WRITE_ENABLED` 也不是全部 MCP 工具的统一禁写门。
+官方网页客户端是否每轮调用工具仍由模型和客户端权限决定，项目指令不能
+保证逐轮无遗漏；此链路也不自动保存完整聊天原文。
